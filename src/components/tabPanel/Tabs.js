@@ -1,0 +1,34 @@
+import React, { useState } from "react";
+import './Tabs.css';
+
+const Tabs = ({ selected = 0, children, isReadOnly }) => {
+  const [selectedIndex, setSelectedIndex] = useState(selected);
+
+  const handleChange = (index) => {
+    if(!isReadOnly){
+      setSelectedIndex(index);
+    }
+  };
+
+  return (
+    <>
+      <ul>
+        {children.map((elem, index) => {
+          let style = index === selectedIndex ? "selected" : "";
+          return (
+            <li
+              key={index}
+              className={style}
+              onClick={() => handleChange(index)}
+            >
+              {elem.props.title}
+            </li>
+          );
+        })}
+      </ul>
+      <div className="tab">{children[selectedIndex]}</div>
+    </>
+  );
+};
+
+export default Tabs;
