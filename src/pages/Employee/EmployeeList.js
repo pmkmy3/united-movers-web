@@ -38,14 +38,15 @@ const columns = [
     { field: 'firstName', headerName: 'First Name', flex: 1 },
     { field: 'lastName', headerName: 'Last Name', flex: 1  },
     { field: 'gender', headerName: 'Gender', flex: 0.5  },
-    { field: 'dob', headerName: 'DOB', flex: 0.5, sortable: true },
+    { field: 'dob', headerName: 'DOB', flex: 0.6, sortable: true },
     { field: 'email', headerName: 'Email', flex: 1  },
-    { field: 'contactNumber', headerName: 'Contact Number', flex: 0.5  },
+    { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6  },
     { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
     {
         field: 'actions',
         headerName: 'Actions',
-        flex: 0.5,
+        flex: 0.6,
+        sortable: false, filterable: false,
         renderCell: (params) => (
             <div>
                 <IconButton
@@ -126,6 +127,7 @@ const EmployeeList = () => {
                             name="search"
                             autoComplete="off"
                             onChange={handleSearch}
+                            sx={{ width: '50%' }}
                         />
                     </Grid>
                     <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
