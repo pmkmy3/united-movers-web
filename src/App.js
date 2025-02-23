@@ -6,9 +6,7 @@ import Sidebar from './components/sidebar/Sidebar';
 import Header from './components/header/Header';
 import Footer from './components/footer/Footer';
 import Home from './pages/home/Home';
-import Reports from './pages/reports/Reports';
 import Login from './pages/auth/login/Login';
-import EmployeeRegistration from './pages/Employee/EmployeeRegistration';
 import EmployeeList from './pages/Employee/EmployeeList';
 
 const AppContainer = styled.div`
@@ -68,7 +66,6 @@ const App = () => {
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/employee" element={<EmployeeList />} />
-                    <Route path="/employee/create" element={<EmployeeRegistration />} />
                     <Route path="/employee/edit" element={<Navigate to="/" />} /> {/* Redirect unknown routes */}
                   </Routes>
                 </main>

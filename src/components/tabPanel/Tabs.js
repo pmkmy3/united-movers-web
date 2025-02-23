@@ -21,7 +21,7 @@ const Tabs = ({ selected = 0, children, isReadOnly }) => {
               className={style}
               onClick={() => handleChange(index)}
             >
-              {elem.props.title}
+              <div >{elem.props.title + " | "}</div>
             </li>
           );
         })}

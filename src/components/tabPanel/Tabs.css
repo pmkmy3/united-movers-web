@@ -1,8 +1,9 @@
 .tab {
     width: 100%;
-    padding: 25px;
+    padding: 10px;
     font-family: sans-serif;
     color: #444;
+    font-weight: bold;
   }
   
   ul.inline {
@@ -24,7 +25,7 @@
     border-bottom: 2px solid #eee;
     transition: all 0.5s;
     font-family: Lato, sans-serif;
-    font-weight: 300;
+    font-weight: bold;
     cursor: pointer;
     color: #aaa;
   }
