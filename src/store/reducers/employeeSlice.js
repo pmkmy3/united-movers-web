@@ -2,26 +2,26 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
 const API_BASE_URL = 'https://unitedmovers.com/api/';
 const employees = [
-    { id: 1, firstName: 'John', lastName: 'Doe', gender: 'Female', dob: '1991-01-02', email: 'john.doe@example.com', contactNumber: '918765410', bloodGroup: 'A+' },
-    { id: 2, firstName: 'Emily', lastName: 'Smith', gender: 'Male', dob: '1992-02-03', email: 'emily.smith@example.com', contactNumber: '928765421', bloodGroup: 'A-' },
-    { id: 3, firstName: 'Michael', lastName: 'Brown', gender: 'Female', dob: '1993-03-04', email: 'michael.brown@example.com', contactNumber: '938765432', bloodGroup: 'B+' },
-    { id: 4, firstName: 'Sarah', lastName: 'Johnson', gender: 'Male', dob: '1994-04-05', email: 'sarah.johnson@example.com', contactNumber: '948765443', bloodGroup: 'B-' },
-    { id: 5, firstName: 'David', lastName: 'Williams', gender: 'Female', dob: '1995-05-06', email: 'david.williams@example.com', contactNumber: '958765454', bloodGroup: 'O+' },
-    { id: 6, firstName: 'Emma', lastName: 'Jones', gender: 'Male', dob: '1996-06-07', email: 'emma.jones@example.com', contactNumber: '968765465', bloodGroup: 'O-' },
-    { id: 7, firstName: 'Daniel', lastName: 'Garcia', gender: 'Female', dob: '1997-07-08', email: 'daniel.garcia@example.com', contactNumber: '978765476', bloodGroup: 'AB+' },
-    { id: 8, firstName: 'Olivia', lastName: 'Martinez', gender: 'Male', dob: '1998-08-09', email: 'olivia.martinez@example.com', contactNumber: '988765487', bloodGroup: 'AB-' },
-    { id: 9, firstName: 'Matthew', lastName: 'Rodriguez', gender: 'Female', dob: '1999-09-10', email: 'matthew.rodriguez@example.com', contactNumber: '998765498', bloodGroup: 'A+' },
-    { id: 10, firstName: 'Sophia', lastName: 'Hernandez', gender: 'Male', dob: '1990-01-11', email: 'sophia.hernandez@example.com', contactNumber: '908765409', bloodGroup: 'A-' },
-    { id: 11, firstName: 'James', lastName: 'Lopez', gender: 'Female', dob: '1991-02-12', email: 'james.lopez@example.com', contactNumber: '918765410', bloodGroup: 'B+' },
-    { id: 12, firstName: 'Isabella', lastName: 'Gonzalez', gender: 'Male', dob: '1992-03-13', email: 'isabella.gonzalez@example.com', contactNumber: '928765421', bloodGroup: 'B-' },
-    { id: 13, firstName: 'Benjamin', lastName: 'Wilson', gender: 'Female', dob: '1993-04-14', email: 'benjamin.wilson@example.com', contactNumber: '938765432', bloodGroup: 'O+' },
-    { id: 14, firstName: 'Mia', lastName: 'Anderson', gender: 'Male', dob: '1994-05-15', email: 'mia.anderson@example.com', contactNumber: '948765443', bloodGroup: 'O-' },
-    { id: 15, firstName: 'William', lastName: 'Thomas', gender: 'Female', dob: '1995-06-16', email: 'william.thomas@example.com', contactNumber: '958765454', bloodGroup: 'AB+' },
-    { id: 16, firstName: 'Charlotte', lastName: 'Taylor', gender: 'Male', dob: '1996-07-17', email: 'charlotte.taylor@example.com', contactNumber: '968765465', bloodGroup: 'AB-' },
-    { id: 17, firstName: 'Alexander', lastName: 'Moore', gender: 'Female', dob: '1997-08-18', email: 'alexander.moore@example.com', contactNumber: '978765476', bloodGroup: 'A+' },
-    { id: 18, firstName: 'Amelia', lastName: 'Jackson', gender: 'Male', dob: '1998-09-19', email: 'amelia.jackson@example.com', contactNumber: '988765487', bloodGroup: 'A-' },
-    { id: 19, firstName: 'Ethan', lastName: 'White', gender: 'Female', dob: '1999-01-20', email: 'ethan.white@example.com', contactNumber: '998765498', bloodGroup: 'B+' },
-    { id: 20, firstName: 'Harper', lastName: 'Harris', gender: 'Male', dob: '1990-02-21', email: 'harper.harris@example.com', contactNumber: '908765409', bloodGroup: 'B-' }
+    { id: 1, firstName: 'John', lastName: 'Doe', gender: 'Female', dateOfBirth: '1991-01-02', personalEmail: 'john.doe@example.com', contactNumber: '918765410', bloodGroup: 'A+' },
+    { id: 2, firstName: 'Emily', lastName: 'Smith', gender: 'Male', dateOfBirth: '1992-02-03', personalEmail: 'emily.smith@example.com', contactNumber: '928765421', bloodGroup: 'A-' },
+    { id: 3, firstName: 'Michael', lastName: 'Brown', gender: 'Female', dateOfBirth: '1993-03-04', personalEmail: 'michael.brown@example.com', contactNumber: '938765432', bloodGroup: 'B+' },
+    { id: 4, firstName: 'Sarah', lastName: 'Johnson', gender: 'Male', dateOfBirth: '1994-04-05', personalEmail: 'sarah.johnson@example.com', contactNumber: '948765443', bloodGroup: 'B-' },
+    { id: 5, firstName: 'David', lastName: 'Williams', gender: 'Female', dateOfBirth: '1995-05-06', personalEmail: 'david.williams@example.com', contactNumber: '958765454', bloodGroup: 'O+' },
+    { id: 6, firstName: 'Emma', lastName: 'Jones', gender: 'Male', dateOfBirth: '1996-06-07', personalEmail: 'emma.jones@example.com', contactNumber: '968765465', bloodGroup: 'O-' },
+    { id: 7, firstName: 'Daniel', lastName: 'Garcia', gender: 'Female', dateOfBirth: '1997-07-08', personalEmail: 'daniel.garcia@example.com', contactNumber: '978765476', bloodGroup: 'AB+' },
+    { id: 8, firstName: 'Olivia', lastName: 'Martinez', gender: 'Male', dateOfBirth: '1998-08-09', personalEmail: 'olivia.martinez@example.com', contactNumber: '988765487', bloodGroup: 'AB-' },
+    { id: 9, firstName: 'Matthew', lastName: 'Rodriguez', gender: 'Female', dateOfBirth: '1999-09-10', personalEmail: 'matthew.rodriguez@example.com', contactNumber: '998765498', bloodGroup: 'A+' },
+    { id: 10, firstName: 'Sophia', lastName: 'Hernandez', gender: 'Male', dateOfBirth: '1990-01-11', personalEmail: 'sophia.hernandez@example.com', contactNumber: '908765409', bloodGroup: 'A-' },
+    { id: 11, firstName: 'James', lastName: 'Lopez', gender: 'Female', dateOfBirth: '1991-02-12', personalEmail: 'james.lopez@example.com', contactNumber: '918765410', bloodGroup: 'B+' },
+    { id: 12, firstName: 'Isabella', lastName: 'Gonzalez', gender: 'Male', dateOfBirth: '1992-03-13', personalEmail: 'isabella.gonzalez@example.com', contactNumber: '928765421', bloodGroup: 'B-' },
+    { id: 13, firstName: 'Benjamin', lastName: 'Wilson', gender: 'Female', dateOfBirth: '1993-04-14', personalEmail: 'benjamin.wilson@example.com', contactNumber: '938765432', bloodGroup: 'O+' },
+    { id: 14, firstName: 'Mia', lastName: 'Anderson', gender: 'Male', dateOfBirth: '1994-05-15', personalEmail: 'mia.anderson@example.com', contactNumber: '948765443', bloodGroup: 'O-' },
+    { id: 15, firstName: 'William', lastName: 'Thomas', gender: 'Female', dateOfBirth: '1995-06-16', personalEmail: 'william.thomas@example.com', contactNumber: '958765454', bloodGroup: 'AB+' },
+    { id: 16, firstName: 'Charlotte', lastName: 'Taylor', gender: 'Male', dateOfBirth: '1996-07-17', personalEmail: 'charlotte.taylor@example.com', contactNumber: '968765465', bloodGroup: 'AB-' },
+    { id: 17, firstName: 'Alexander', lastName: 'Moore', gender: 'Female', dateOfBirth: '1997-08-18', personalEmail: 'alexander.moore@example.com', contactNumber: '978765476', bloodGroup: 'A+' },
+    { id: 18, firstName: 'Amelia', lastName: 'Jackson', gender: 'Male', dateOfBirth: '1998-09-19', personalEmail: 'amelia.jackson@example.com', contactNumber: '988765487', bloodGroup: 'A-' },
+    { id: 19, firstName: 'Ethan', lastName: 'White', gender: 'Female', dateOfBirth: '1999-01-20', personalEmail: 'ethan.white@example.com', contactNumber: '998765498', bloodGroup: 'B+' },
+    { id: 20, firstName: 'Harper', lastName: 'Harris', gender: 'Male', dateOfBirth: '1990-02-21', personalEmail: 'harper.harris@example.com', contactNumber: '908765409', bloodGroup: 'B-' }
 ];
 
 
@@ -37,6 +37,20 @@ export const fetchEmployees = createAsyncThunk('employees/fetchEmployees', async
         }, 2000);
       });
 });
+
+export const fetchEmployeeById = createAsyncThunk('employees/fetchEmployeeById', async (id) => {
+    // const response = await fetch(`${API_URL}/${id}`);
+    // if (!response.ok) {
+    //     throw new Error('Failed to fetch employee');
+    // }
+    // return response.json();
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(employees.find((employee) => employee.id === id));
+        }, 2000);
+    });
+});
+
 
 export const addEmployee = createAsyncThunk('employees/addEmployee', async (employee) => {
     const response = await fetch(API_BASE_URL, {
@@ -112,6 +126,23 @@ const employeeSlice = createSlice({
                 state.employees = action.payload;
             })
             .addCase(fetchEmployees.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchEmployeeById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchEmployeeById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.employees = state.employees.map((employee) => {
+                    if (employee.id === action.payload.id) {
+                        return action.payload;
+                    }
+                    return employee;
+                });
+            })
+            .addCase(fetchEmployeeById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })

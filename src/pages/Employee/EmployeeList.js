@@ -7,48 +7,11 @@ import {
     GridToolbarExport,
     GridToolbarFilterButton
 } from '@mui/x-data-grid';
-import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Button } from '@mui/material';
+import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Button, Tooltip } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 import EmployeeFormModal from './EmployeeFormModal';
 
-  
-const columns = [
-    { field: 'firstName', headerName: 'First Name', flex: 1 },
-    { field: 'lastName', headerName: 'Last Name', flex: 1  },
-    { field: 'gender', headerName: 'Gender', flex: 0.5  },
-    { field: 'dob', headerName: 'DOB', flex: 0.6, sortable: true },
-    { field: 'email', headerName: 'Email', flex: 1  },
-    { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6  },
-    { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
-    {
-        field: 'actions',
-        headerName: 'Actions',
-        flex: 0.6,
-        sortable: false, filterable: false,
-        renderCell: (params) => (
-            <div>
-                <IconButton
-                    color="primary"
-                    size="small"
-                    style={{ marginRight: 8 }}
-                    onClick={() => handleEdit(params.row)}
-                    sx={{ width: "50px", Height: "50px" }}
-                >
-                    <FontAwesomeIcon icon={faEdit} />
-                </IconButton>
-                <IconButton
-                    color="secondary"
-                    size="small"
-                    onClick={() => handleActivate(params.row)}
-                    sx={{ width: "50px", Height: "50px" }}
-                >
-                    <FontAwesomeIcon icon={faCheckCircle} />
-                </IconButton>
-            </div>
-        ),
-    },
-];
 
 const CustomToolbar = () => {
     return (
@@ -59,16 +22,6 @@ const CustomToolbar = () => {
     );
 };
 
-const handleEdit = (row) => {
-    // Add logic to handle editing the employee
-    console.log("Edit", row);
-};
-
-const handleActivate = (row) => {
-    // Add logic to handle activating the employee
-    console.log("Activate", row);
-};
-
 const EmployeeList = () => {
     const { employees, loading, error } = useSelector(state => state.employees);
     const dispatch = useDispatch();
@@ -76,10 +29,13 @@ const EmployeeList = () => {
     const [searchText, setSearchText] = useState('');
     const [filteredEmployees, setFilteredEmployees] = useState(employees);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+    const [isEdit, setIsEdit] = useState(false);
 
     useEffect(() => {
         dispatch(fetchEmployees());
     }, [dispatch]);
+
     useEffect(() => {
         setFilteredEmployees(employees);
     }, [employees]);
@@ -96,6 +52,49 @@ const EmployeeList = () => {
         );
     };
 
+    const handleEdit = (employeeId) => {
+        setSelectedEmployeeId(employeeId);
+        setIsEdit(true);
+    };
+
+    const handleActivate = (row) => {
+        // Add logic to handle activating the employee
+        console.log("Activate", row);
+    };
+
+    const iconStyle = { color: "black", fontSize: "1.5em" }
+
+    const columns = [
+        { field: 'firstName', headerName: 'First Name', flex: 1 },
+        { field: 'lastName', headerName: 'Last Name', flex: 1  },
+        { field: 'gender', headerName: 'Gender', flex: 0.5  },
+        { field: 'dateOfBirth', headerName: 'DOB', flex: 0.6, sortable: true },
+        { field: 'personalEmail', headerName: 'Email', flex: 1  },
+        { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6  },
+        { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            flex: 0.6,
+            sortable: false, filterable: false,
+            renderCell: (params) => (
+                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                    <EmployeeFormModal employeeId={params.row.id} isEdit={true} />
+                    <IconButton
+                        color="secondary"
+                        size="small"
+                        onClick={() => handleActivate(params.row)}
+                        sx={{ width: "50px", Height: "50px" }}
+                    >
+                        <Tooltip title="Activate Employee" arrow>
+                            <FontAwesomeIcon icon={(true)? faSquare : faCheckSquare } color='blue' />
+                        </Tooltip>
+                    </IconButton>
+                </div>
+            ),
+        },
+    ];
+    
        
     return (
         <Container component="main" maxWidth={false} sx={{ maxwidth: '100%'  }}>
@@ -119,7 +118,7 @@ const EmployeeList = () => {
                         />
                     </Grid>
                     <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
-                        <EmployeeFormModal employee={{}} isEdit={false} />
+                        <EmployeeFormModal employeeId={selectedEmployeeId} isEdit={isEdit} />
                     </Grid>
                 </Grid>
                 <Box sx={{ minHeight: "100%", width: '100%' }}>

@@ -1,25 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { addEmployee, updateEmployeePersonalInformation } from '../../store/reducers/employeeSlice';
-import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, Snackbar, Alert } from '@mui/material';
+import { fetchEmployeeById, addEmployee, updateEmployeePersonalInformation } from '../../store/reducers/employeeSlice';
+import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, Snackbar, Alert, IconButton, Tooltip } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit } from '@fortawesome/free-regular-svg-icons';
 
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    boxShadow: 24,
-    p: 4,
-    borderRadius: 2,
-};
-
-const EmployeeFormModal = ({ employee, isEdit }) => {
+const EmployeeFormModal = ({ employeeId, isEdit }) => {
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
         employeeId: "",
@@ -67,10 +57,12 @@ const EmployeeFormModal = ({ employee, isEdit }) => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (isEdit && employee && employee.employeeId) {
-            setFormData(employee);
+        if (isEdit && employeeId) {
+            dispatch(fetchEmployeeById(employeeId)).then((response) => {
+                setFormData(response.payload);
+            });
         }
-    }, [isEdit, employee]);
+    }, [dispatch]);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -107,7 +99,10 @@ const EmployeeFormModal = ({ employee, isEdit }) => {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           return emailRegex.test(formData[field]);
         }
-        return formData[field].trim() !== "";
+        if(formData[field]) {
+            return formData[field].trim() !== "";
+        }
+        return true;
     };
 
     const getFieldError = (field) => {
@@ -131,8 +126,8 @@ const EmployeeFormModal = ({ employee, isEdit }) => {
                 bloodGroup: formData.bloodGroup,
                 personalEmail: formData.personalEmail
             }
-            if (isEdit && employee && employee.employeeId) {
-                await dispatch(updateEmployeePersonalInformation(...piData, ...{employeeId : employee.employeeId}));
+            if (isEdit && employeeId) {
+                await dispatch(updateEmployeePersonalInformation(...piData, ...{employeeId}));
                 setSnackbarMessage('Employee updated successfully!');
                 setSnackbarSeverity('success');
             } else {
@@ -152,7 +147,22 @@ const EmployeeFormModal = ({ employee, isEdit }) => {
 
     return (
         <div>
-            <Button variant="contained" color="primary" onClick={handleOpen}>Add New</Button>
+            {
+                isEdit && employeeId ? 
+                (
+                    <IconButton
+                        color="primary"
+                        size="small"
+                        style={{ marginRight: 8 }}
+                        onClick={handleOpen}
+                        sx={{ width: "50px", Height: "50px" }}
+                    >
+                        <Tooltip title="Edit Employee" arrow><FontAwesomeIcon icon={faEdit} /></Tooltip>
+                    </IconButton>
+                )
+                : <Button variant="contained" color="primary" onClick={handleOpen}>Add New</Button>
+            }
+            
             <Modal
                 open={open}
                 onClose={handleClose}
@@ -216,9 +226,9 @@ const EmployeeFormModal = ({ employee, isEdit }) => {
                                         error={!isFieldValid("gender") && touched.gender}
                                         helperText={getFieldError("gender")}
                                         >
-                                        <MenuItem value="male">Male</MenuItem>
-                                        <MenuItem value="female">Female</MenuItem>
-                                        <MenuItem value="other">Other</MenuItem>
+                                        <MenuItem value="Male">Male</MenuItem>
+                                        <MenuItem value="Female">Female</MenuItem>
+                                        <MenuItem value="Other">Other</MenuItem>
                                         </TextField>
                                     </Grid>
                                     <Grid size={5}>
