@@ -12,7 +12,7 @@ const Tabs = ({ selected = 0, children, isReadOnly }) => {
 
   return (
     <>
-      <ul>
+      <ul style={{ marginBottom: "0px"}}>
         {children.map((elem, index) => {
           let style = index === selectedIndex ? "selected" : "";
           return (

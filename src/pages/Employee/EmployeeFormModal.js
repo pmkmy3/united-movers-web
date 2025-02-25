@@ -95,14 +95,15 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
     };
 
     const isFieldValid = (field) => {
-        if (field === "personalEmail") {
+        if (field === "personalEmail" || field === "alternativeEmail") {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           return emailRegex.test(formData[field]);
         }
-        if(formData[field]) {
-            return formData[field].trim() !== "";
+        else if(field === "alternativeContactNumber" || field === "emergencyContactNumber") {
+            const contactNumberRegex = /^\d{10}$/;
+            return contactNumberRegex.test(formData[field]);
         }
-        return true;
+        return formData[field] && formData[field].trim() !== "";
     };
 
     const getFieldError = (field) => {
@@ -144,6 +145,15 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
         }
     };
       
+    const handleCISave = async () => {
+        try{
+
+        } catch(err){
+
+        } finally {
+
+        }
+    }
 
     return (
         <div>
@@ -172,14 +182,14 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                 <Box sx={{ top: '50%', left: '50%', transform: 'translate(-50%, -50%)', position: 'absolute', bgcolor: 'background.paper', boxShadow: 24, p: 4, height: 650, width: 1100 }}>
                     <Grid container spacing={3}>
                         <Grid size={6}>
-                            <Typography id="modal-title" variant="h6" component="h2">Employee Form</Typography>
+                            <Typography id="modal-title" variant="h6" sx={{ fontWeight: 900 }}>Employee Form</Typography>
                         </Grid>
                         <Grid size={6} sx={{ textAlign: 'right'}}>
                             <CloseRoundedIcon style={{ 'color': "red", 'cursor' : "pointer"}} onClick={handleClose} />
                         </Grid>
-                        <Tabs selected={0} >
+                        <Tabs selected={0} isReadOnly={!(employeeId && isEdit)}>
                             <Panel title="Personal Information">
-                                <Grid container rowSpacing={2} columnSpacing={3} sx={{overflowY: "auto", maxHeight: 400}}>
+                                <Grid container rowSpacing={3} columnSpacing={3} sx={{overflowY: "auto", maxHeight: 400}}>
                                     <Grid size={5} sx={{ marginTop: 1 }}>
                                         <TextField
                                         fullWidth
@@ -352,7 +362,260 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                                 </Grid>
                             </Panel>
                             <Panel title="Contact Information">
-
+                                <Grid container rowSpacing={1} columnSpacing={3} sx={{overflowY: "auto", maxHeight: 380}}>
+                                    <Typography variant="h7" sx={{ fontWeight: 900 }}>Address</Typography>
+                                    <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Address Line 1"
+                                                variant="outlined"
+                                                size="small"
+                                                name="addressLine1"
+                                                value={formData.addressLine1}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("addressLine1") && touched.addressLine1}
+                                                helperText={getFieldError("addressLine1")}
+                                                maxLength={200}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Address Line 2"
+                                                variant="outlined"
+                                                size="small"
+                                                name="addressLine2"
+                                                value={formData.addressLine2}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("addressLine2") && touched.addressLine2}
+                                                helperText={getFieldError("addressLine2")}
+                                                maxLength={200}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="State"
+                                                variant="outlined"
+                                                size="small"
+                                                name="state"
+                                                value={formData.state}
+                                                onChange={handleChange}
+                                                maxLength={80}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="City"
+                                                variant="outlined"
+                                                size="small"
+                                                name="city"
+                                                value={formData.city}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("state") && touched.state}
+                                                helperText={getFieldError("state")}
+                                                maxLength={80}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Zip"
+                                                variant="outlined"
+                                                size="small"
+                                                name="zip"
+                                                value={formData.zip}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("city") && touched.city}
+                                                helperText={getFieldError("city")}
+                                                maxLength={10}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Landmark"
+                                                variant="outlined"
+                                                size="small"
+                                                name="landmark"
+                                                value={formData.landmark}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("zip") && touched.zip}
+                                                helperText={getFieldError("zip")}
+                                                maxLength={80}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <Typography variant="h7" sx={{ fontWeight: 900 }}>Alternative Contact Number</Typography>
+                                    <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Alternative Contact Number"
+                                                variant="outlined"
+                                                size="small"
+                                                name="alternativeContactNumber"
+                                                value={formData.alternativeContactNumber}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={touched.alternativeContactNumber && (!/^\d{10}$/.test(formData.alternativeContactNumber) || formData.alternativeContactNumber.length !== 10)}
+                                                helperText={touched.alternativeContactNumber && (!/^\d{10}$/.test(formData.alternativeContactNumber) || formData.alternativeContactNumber.length !== 10) ? "Alternative Contact Number must be a 10-digit number" : ""}  
+                                                type='number'
+                                                slotProps={{ htmlInput: { maxLength: 10 } }}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Alternative Email"
+                                                variant="outlined"
+                                                size="small"
+                                                name="alternativeEmail"
+                                                value={formData.alternativeEmail}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("alternativeEmail") && touched.alternativeEmail}
+                                                helperText={getFieldError("alternativeEmail")}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <Typography variant="h7" sx={{ fontWeight: 900 }}>Emergency Contact Section</Typography>
+                                    <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Emergency Contact Name"
+                                                variant="outlined"
+                                                size="small"
+                                                name="emergencyContactName"
+                                                value={formData.emergencyContactName}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("emergencyContactName") && touched.emergencyContactName}
+                                                helperText={getFieldError("emergencyContactName")}
+                                                maxLength={80}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Emergency Contact Relation"
+                                                variant="outlined"
+                                                size="small"
+                                                name="emergencyContactRelation"
+                                                value={formData.emergencyContactRelation}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("emergencyContactRelation") && touched.emergencyContactRelation}
+                                                helperText={getFieldError("emergencyContactRelation")}
+                                                maxLength={80}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Emergency Contact ID"
+                                                variant="outlined"
+                                                size="small"
+                                                name="emergencyContactId"
+                                                value={formData.emergencyContactId}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("emergencyContactId") && touched.emergencyContactId}
+                                                helperText={getFieldError("emergencyContactId")}
+                                                maxLength={80}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Emergency Contact Number"
+                                                variant="outlined"
+                                                size="small"
+                                                name="emergencyContactNumber"
+                                                value={formData.emergencyContactNumber}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={touched.emergencyContactNumber && (!/^\d{10}$/.test(formData.emergencyContactNumber) || formData.emergencyContactNumber.length !== 10)}
+                                                helperText={touched.emergencyContactNumber && (!/^\d{10}$/.test(formData.emergencyContactNumber) || formData.emergencyContactNumber.length !== 10) ? "Emergency Contact Number must be a 10-digit number" : ""}  
+                                                type='number'
+                                                slotProps={{ htmlInput: { maxLength: 10 } }}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <Typography variant="h7" sx={{ fontWeight: 900 }}>Other Info</Typography>
+                                    <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Highest Degree Earned"
+                                                variant="outlined"
+                                                size="small"
+                                                name="highestDegree"
+                                                value={formData.highestDegree}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("highestDegree") && touched.highestDegree}
+                                                helperText={getFieldError("highestDegree")}
+                                                maxLength={80}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Last Company Name"
+                                                variant="outlined"
+                                                size="small"
+                                                name="lastCompanyName"
+                                                value={formData.lastCompanyName}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("lastCompanyName") && touched.lastCompanyName}
+                                                helperText={getFieldError("lastCompanyName")}
+                                                maxLength={80}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    {
+                                        isEdit && (
+                                        <Grid size={10} mt={2} >
+                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                color="primary"
+                                                onClick={() => handleCISave()}
+                                                disabled={!isPanelValid(["addressLine1", "addressLine2", "state", "city", "zip", "landmark", 
+                                                    "alternativeContactNumber", "alternativeEmail", "emergencyContactName", "emergencyContactRelation", 
+                                                    "emergencyContactId", "emergencyContactNumber", "highestDegree", "lastCompanyName" ])}
+                                            >
+                                                Save
+                                            </Button>
+                                            </Box>
+                                        </Grid>
+                                        )
+                                    }
+                                </Grid>
                             </Panel>
                             <Panel title="Financial Details"></Panel>
                             <Panel title="Admin Section"></Panel>

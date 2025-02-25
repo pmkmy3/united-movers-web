@@ -79,7 +79,7 @@ const EmployeeList = () => {
             sortable: false, filterable: false,
             renderCell: (params) => (
                 <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <EmployeeFormModal employeeId={params.row.id} isEdit={true} />
+                    <EmployeeFormModal employeeId={params.row.employeeId} isEdit={true} />
                     <IconButton
                         color="secondary"
                         size="small"
@@ -123,6 +123,7 @@ const EmployeeList = () => {
                 </Grid>
                 <Box sx={{ minHeight: "100%", width: '100%' }}>
                     <DataGrid
+                        getRowId={(row) => row.employeeId}
                         rows={filteredEmployees}
                         columns={columns}
                         paginationModel={paginationModel}
