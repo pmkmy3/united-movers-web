@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { fetchEmployeeById, addEmployee, updateEmployeePersonalInformation } from '../../store/reducers/employeeSlice';
-import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, Snackbar, Alert, IconButton, Tooltip } from '@mui/material';
+import { fetchEmployeeById, addEmployee, updateEmployeePersonalInformation, 
+    updateEmployeeContactInformation, updateEmployeeFinancialDetails, 
+    updateEmployeeAdminSection } from '../../store/reducers/employeeSlice';
+import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, 
+    Snackbar, Alert, IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
+    FormControlLabel, Radio } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
@@ -11,7 +15,7 @@ import { faEdit } from '@fortawesome/free-regular-svg-icons';
 
 const EmployeeFormModal = ({ employeeId, isEdit }) => {
     const [open, setOpen] = useState(false);
-    const [formData, setFormData] = useState({
+    let [formData, setFormData] = useState({
         employeeId: "",
         firstName: "",
         lastName: "",
@@ -44,9 +48,9 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
         insuranceCompanyName: "",
         insuranceStartDate: "",
         insuranceEndDate: "",
-        hasBackgroundVerification: "",
+        hasBackgroundVerification: "No",
         agencyName: "",
-        hasPhysicalVerificationDone: false
+        hasPhysicalVerificationDone: "No"
     });
     const [touched, setTouched] = useState({});
 
@@ -77,14 +81,21 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         switch(name) {
-          case "aadhaarNumber": {
-            if (!/^\d*$/.test(value) || value.length > 12) return;
-            break;
-          }
-          case "contactNumber": {
-            if (!/^\d*$/.test(value) || value.length > 10) return;
-            break;
-          }
+            case "aadhaarNumber": {
+                if (!/^\d*$/.test(value) || value.length > 12) return;
+                break;
+            }
+            case "contactNumber": {
+                if (!/^\d*$/.test(value) || value.length > 10) return;
+                break;
+            }
+            case 'hasBackgroundVerification': {
+                if (value === "Yes") {
+                    formData = {...formData, hasPhysicalVerificationDone : "No"};
+                    formData.agencyName = "";
+                }
+                break;
+            }
         }
         
         setFormData({ ...formData, [name]: value });
@@ -128,16 +139,16 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                 personalEmail: formData.personalEmail
             }
             if (isEdit && employeeId) {
-                await dispatch(updateEmployeePersonalInformation(...piData, ...{employeeId}));
-                setSnackbarMessage('Employee updated successfully!');
+                let data = await dispatch(updateEmployeePersonalInformation(...piData, ...{employeeId}));
+                setSnackbarMessage('Employee Personal Information updated successfully!');
                 setSnackbarSeverity('success');
             } else {
-                await dispatch(addEmployee(piData));
+                let data = await dispatch(addEmployee(piData));
                 setSnackbarMessage('Employee added successfully!');
                 setSnackbarSeverity('success');
             }
         } catch(err){
-            setSnackbarMessage(err.message || 'Failed to update employee!');
+            setSnackbarMessage(err.message || "Failed to update employee's Personal Information!");
             setSnackbarSeverity('error');
         } finally {
             setSnackbarOpen(true);
@@ -147,13 +158,85 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
       
     const handleCISave = async () => {
         try{
-
+            const ciData = {
+                addressLine1: formData.addressLine1,
+                addressLine2: formData.addressLine2,
+                state: formData.state,
+                city: formData.city,
+                zip: formData.zip,
+                landmark: formData.landmark,
+                alternativeContactNumber: formData.alternativeContactNumber,
+                alternativeEmail: formData.alternativeEmail,
+                emergencyContactName: formData.emergencyContactName,
+                emergencyContactRelation: formData.emergencyContactRelation,
+                emergencyContactId: formData.emergencyContactId,
+                emergencyContactNumber: formData.emergencyContactNumber,
+                highestDegree: formData.highestDegree,
+                lastCompanyName: formData.lastCompanyName
+            }
+            if (isEdit && employeeId) {
+                let data = await dispatch(updateEmployeeContactInformation(...ciData, ...{employeeId}));
+                setSnackbarMessage('Employee Contact Information updated successfully!');
+                setSnackbarSeverity('success');
+            }
         } catch(err){
-
+            setSnackbarMessage(err.message || "Failed to update employee's Contact Information");
+            setSnackbarSeverity('error');
         } finally {
-
+            setSnackbarOpen(true);
+            handleClose();
         }
     }
+
+    const handleFDSave = async () => {
+        try{
+            const fdData = {
+                bankName: formData.bankName,
+                bankAccountNumber: formData.bankAccountNumber,
+                ifscCode: formData.ifscCode,
+                uanNumber: formData.uanNumber,
+                insurancePolicyNumber: formData.insurancePolicyNumber,
+                insuranceCompanyName: formData.insuranceCompanyName,
+                insuranceStartDate: formData.insuranceStartDate,
+                insuranceEndDate: formData.insuranceEndDate
+            }
+            if (isEdit && employeeId) {
+                let data = await dispatch(updateEmployeeFinancialDetails(...fdData, ...{employeeId}));
+                setSnackbarMessage('Employee Financial Details updated successfully!');
+                setSnackbarSeverity('success');
+            }
+        }
+        catch(err){
+            setSnackbarMessage(err.message || "Failed to update employee's Financial Details!");
+            setSnackbarSeverity('error');
+        } finally {
+            setSnackbarOpen(true);
+            handleClose();
+        }
+    }
+
+    const handleASSave = async () => {
+        try{
+            const aData = {
+                hasBackgroundVerification: formData.hasBackgroundVerification,
+                agencyName: formData.agencyName,
+                hasPhysicalVerificationDone: formData.hasPhysicalVerificationDone
+            }
+            if (isEdit && employeeId) {
+                let data = await dispatch(updateEmployeeAdminSection(...aData, ...{employeeId}));
+                setSnackbarMessage('Employee Admin Section updated successfully!');
+                setSnackbarSeverity('success');
+            }
+        }
+        catch(err){
+            setSnackbarMessage(err.message || "Failed to update employee's Admin Section!");
+            setSnackbarSeverity('error');
+        } finally {
+            setSnackbarOpen(true);
+            handleClose();
+        }
+    }
+
 
     return (
         <div>
@@ -189,7 +272,7 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                         </Grid>
                         <Tabs selected={0} isReadOnly={!(employeeId && isEdit)}>
                             <Panel title="Personal Information">
-                                <Grid container rowSpacing={3} columnSpacing={3} sx={{overflowY: "auto", maxHeight: 400}}>
+                                <Grid container rowSpacing={2} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
                                     <Grid size={5} sx={{ marginTop: 1 }}>
                                         <TextField
                                         fullWidth
@@ -346,7 +429,7 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                                         helperText={getFieldError("personalEmail")}
                                         />
                                     </Grid>
-                                    <Grid size={10} >
+                                    <Grid size={10} sx={{ mt: 2, mb: 2 }}>
                                         <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                             <Button
                                                 variant="contained"
@@ -362,7 +445,7 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                                 </Grid>
                             </Panel>
                             <Panel title="Contact Information">
-                                <Grid container rowSpacing={1} columnSpacing={3} sx={{overflowY: "auto", maxHeight: 380}}>
+                                <Grid container rowSpacing={1} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
                                     <Typography variant="h7" sx={{ fontWeight: 900 }}>Address</Typography>
                                     <Grid container rowSpacing={1} columnSpacing={3} size={12}>
                                         <Grid size={5}>
@@ -598,27 +681,261 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                                     </Grid>
                                     {
                                         isEdit && (
-                                        <Grid size={10} mt={2} >
+                                        <Grid size={10} sx={{ mt: 2, mb: 2 }} >
                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                            <Button
-                                                variant="contained"
-                                                size="small"
-                                                color="primary"
-                                                onClick={() => handleCISave()}
-                                                disabled={!isPanelValid(["addressLine1", "addressLine2", "state", "city", "zip", "landmark", 
-                                                    "alternativeContactNumber", "alternativeEmail", "emergencyContactName", "emergencyContactRelation", 
-                                                    "emergencyContactId", "emergencyContactNumber", "highestDegree", "lastCompanyName" ])}
-                                            >
-                                                Save
-                                            </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    size="small"
+                                                    color="primary"
+                                                    onClick={() => handleCISave()}
+                                                    disabled={!isPanelValid(["addressLine1", "addressLine2", "state", "city", "zip", "landmark", 
+                                                        "alternativeContactNumber", "alternativeEmail", "emergencyContactName", "emergencyContactRelation", 
+                                                        "emergencyContactId", "emergencyContactNumber", "highestDegree", "lastCompanyName" ])}
+                                                >
+                                                    Save
+                                                </Button>
                                             </Box>
                                         </Grid>
                                         )
                                     }
                                 </Grid>
                             </Panel>
-                            <Panel title="Financial Details"></Panel>
-                            <Panel title="Admin Section"></Panel>
+                            <Panel title="Financial Details">
+                            <Grid container rowSpacing={1} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
+                                <Typography variant="h7" sx={{ fontWeight: 900 }}>Bank Account Details</Typography>
+                                <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                    <Grid size={5}>
+                                        <TextField
+                                            fullWidth
+                                            label="Bank Name"
+                                            variant="outlined"
+                                            size="small"
+                                            name="bankName"
+                                            value={formData.bankName}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            required
+                                            error={!isFieldValid("bankName") && touched.bankName}
+                                            helperText={getFieldError("bankName")}
+                                            maxLength={100}
+                                        />
+                                    </Grid>
+                                    <Grid size={5}>
+                                        <TextField
+                                            fullWidth
+                                            label="Bank Account Number"
+                                            variant="outlined"
+                                            size="small"
+                                            name="bankAccountNumber"
+                                            value={formData.bankAccountNumber}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            required
+                                            error={!isFieldValid("bankAccountNumber") && touched.bankAccountNumber}
+                                            helperText={getFieldError("bankAccountNumber")}
+                                            maxLength={50}
+                                        />
+                                    </Grid>
+                                    <Grid size={5}>
+                                    <TextField
+                                        fullWidth
+                                        label="IFSC code"
+                                        variant="outlined"
+                                        size="small"
+                                        name="ifscCode"
+                                        value={formData.ifscCode}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        required
+                                        error={!isFieldValid("ifscCode") && touched.ifscCode}
+                                        helperText={getFieldError("ifscCode")}
+                                        maxLength={50}
+                                    />
+                                    </Grid>
+                                </Grid>
+                                <Typography variant="h7" sx={{ fontWeight: 900 }}>PF Details</Typography>
+                                <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                    <Grid size={5}>
+                                        <TextField
+                                            fullWidth
+                                            label="UAN Number"
+                                            variant="outlined"
+                                            size="small"
+                                            name="uanNumber"
+                                            value={formData.uanNumber}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            required
+                                            error={!isFieldValid("uanNumber") && touched.uanNumber}
+                                            helperText={getFieldError("uanNumber")}
+                                            maxLength={50}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                <Typography variant="h7" sx={{ fontWeight: 900 }}>Insurance Details</Typography>
+                                <Grid container rowSpacing={3} columnSpacing={3} size={12}>
+                                    <Grid size={5}>
+                                        <TextField
+                                            fullWidth
+                                            label="Insurance Policy Number"
+                                            variant="outlined"
+                                            size="small"
+                                            name="insurancePolicyNumber"
+                                            value={formData.insurancePolicyNumber}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            required
+                                            error={!isFieldValid("insurancePolicyNumber") && touched.insurancePolicyNumber}
+                                            helperText={getFieldError("insurancePolicyNumber")}
+                                            maxLength={50}
+                                        />
+                                    </Grid>
+                                    <Grid size={5}>
+                                        <TextField
+                                            fullWidth
+                                            label="Insurance Company Name"
+                                            variant="outlined"
+                                            size="small"
+                                            name="insuranceCompanyName"
+                                            value={formData.insuranceCompanyName}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            required
+                                            error={!isFieldValid("insuranceCompanyName") && touched.insuranceCompanyName}
+                                            helperText={getFieldError("insuranceCompanyName")}
+                                            maxLength={50}
+                                        />
+                                    </Grid>
+                                    <Grid size={5}>
+                                        <TextField
+                                            fullWidth
+                                            label="Insurance Start Date"
+                                            variant="outlined"
+                                            size="small"
+                                            type="date"
+                                            slotProps={{ inputLabel: { shrink: true } }}
+                                            name="insuranceStartDate"
+                                            value={formData.insuranceStartDate}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            required
+                                            error={!isFieldValid("insuranceStartDate") && touched.insuranceStartDate}
+                                            helperText={getFieldError("insuranceStartDate")}
+                                        />
+                                    </Grid>
+                                    <Grid size={5}>
+                                        <TextField
+                                            fullWidth
+                                            label="Insurance End Date"
+                                            variant="outlined"
+                                            size="small"
+                                            type="date"
+                                            slotProps={{ inputLabel: { shrink: true } }}
+                                            name="insuranceEndDate"
+                                            value={formData.insuranceEndDate}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            required
+                                            error={!isFieldValid("insuranceEndDate") && touched.insuranceEndDate}
+                                            helperText={getFieldError("insuranceEndDate")}
+                                        />
+                                    </Grid>
+                                </Grid>
+                                {
+                                    isEdit && (
+                                    <Grid size={10} sx={{ mt: 2, mb: 2 }}>
+                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                        <Button
+                                            variant="contained"
+                                            size="small"
+                                            color="primary"
+                                            onClick={() => handleFDSave()}
+                                            disabled={!isPanelValid(["bankName", "bankAccountNumber", "ifscCode", 
+                                                "uanNumber", "insurancePolicyNumber", "insuranceCompanyName", 
+                                                "insuranceStartDate", "insuranceEndDate", ])}
+                                        >
+                                            Save
+                                        </Button>
+                                        </Box>
+                                    </Grid>
+                                    )
+                                }
+                                </Grid>
+                            </Panel>
+                            <Panel title="Admin Section">
+                                <Grid container rowSpacing={2} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
+                                    <Grid size={10}>
+                                        <FormControl component="fieldset" >
+                                            <FormLabel component="legend">Background Verification Completed</FormLabel>
+                                            <RadioGroup
+                                                row
+                                                aria-label="background-verification"
+                                                name="hasBackgroundVerification"
+                                                value={formData.hasBackgroundVerification ?? "No"}
+                                                onChange={handleChange}
+                                            >
+                                                <FormControlLabel value="Yes" control={<Radio />} labelPlacement="end" label="Yes" />
+                                                <FormControlLabel value="No" control={<Radio />} labelPlacement="end" label="No" />
+                                                <FormControlLabel value="NA" control={<Radio />} labelPlacement="end" label="N/A" />
+                                            </RadioGroup>
+                                        </FormControl>
+                                    </Grid>
+                                    {
+                                        formData.hasBackgroundVerification === "Yes" && 
+                                        <>
+                                            <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Agency Name"
+                                                variant="outlined"
+                                                size="small"
+                                                name="agencyName"
+                                                value={formData.agencyName}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("agencyName") && touched.agencyName}
+                                                helperText={getFieldError("agencyName")}
+                                                maxLength={80}
+                                            />
+                                            </Grid>
+                                            <Grid size={10}>
+                                            <FormControl component="fieldset">
+                                                <FormLabel component="legend">Physical Verification Completed</FormLabel>
+                                                <RadioGroup
+                                                    row
+                                                    aria-label="physical-verification"
+                                                    name="hasPhysicalVerificationDone"
+                                                    value={formData.hasPhysicalVerificationDone ?? "No"}
+                                                    onChange={handleChange}
+                                                >
+                                                    <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
+                                                    <FormControlLabel value="No" control={<Radio />} label="No" />
+                                                    <FormControlLabel value="NA" control={<Radio />} label="N/A" />
+                                                </RadioGroup>
+                                            </FormControl>
+                                            </Grid>
+                                        </>
+                                    }
+                                    {
+                                        isEdit && (
+                                        <Grid size={10} sx={{ mt: 2, mb: 2 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                color="primary"
+                                                onClick={() => handleASSave()}
+                                                disabled={!isPanelValid(["hasBackgroundVerification"])}
+                                            >
+                                                Save
+                                            </Button>
+                                            </Box>
+                                        </Grid>
+                                        )   
+                                    }
+                                </Grid>
+                            </Panel>
                             <Panel title="Uploads"></Panel>
                             <Panel title="Activation"></Panel>
                         </Tabs>
