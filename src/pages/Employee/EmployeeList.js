@@ -29,11 +29,11 @@ const EmployeeList = () => {
     const [searchText, setSearchText] = useState('');
     const [filteredEmployees, setFilteredEmployees] = useState(employees);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-    const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+    const [selectedEmployeeID, setSelectedEmployeeID] = useState(null);
     const [isEdit, setIsEdit] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchEmployees());
+        let data = dispatch(fetchEmployees());
     }, [dispatch]);
 
     useEffect(() => {
@@ -52,11 +52,6 @@ const EmployeeList = () => {
         );
     };
 
-    const handleEdit = (employeeId) => {
-        setSelectedEmployeeId(employeeId);
-        setIsEdit(true);
-    };
-
     const handleActivate = (row) => {
         // Add logic to handle activating the employee
         console.log("Activate", row);
@@ -69,7 +64,7 @@ const EmployeeList = () => {
         { field: 'lastName', headerName: 'Last Name', flex: 1  },
         { field: 'gender', headerName: 'Gender', flex: 0.5  },
         { field: 'dateOfBirth', headerName: 'DOB', flex: 0.6, sortable: true },
-        { field: 'personalEmail', headerName: 'Email', flex: 1  },
+        { field: 'personalEmailID', headerName: 'Email', flex: 1  },
         { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6  },
         { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
         {
@@ -79,7 +74,7 @@ const EmployeeList = () => {
             sortable: false, filterable: false,
             renderCell: (params) => (
                 <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <EmployeeFormModal employeeId={params.row.employeeId} isEdit={true} />
+                    <EmployeeFormModal employeeID={params.row.employeeID} isEdit={true} />
                     <IconButton
                         color="secondary"
                         size="small"
@@ -118,12 +113,12 @@ const EmployeeList = () => {
                         />
                     </Grid>
                     <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
-                        <EmployeeFormModal employeeId={selectedEmployeeId} isEdit={isEdit} />
+                        <EmployeeFormModal employeeID={selectedEmployeeID} isEdit={isEdit} />
                     </Grid>
                 </Grid>
                 <Box sx={{ minHeight: "100%", width: '100%' }}>
                     <DataGrid
-                        getRowId={(row) => row.employeeId}
+                        getRowId={(row) => row.employeeID}
                         rows={filteredEmployees}
                         columns={columns}
                         paginationModel={paginationModel}

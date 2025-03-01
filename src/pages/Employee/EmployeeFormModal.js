@@ -5,52 +5,56 @@ import { fetchEmployeeById, addEmployee, updateEmployeePersonalInformation,
     updateEmployeeAdminSection } from '../../store/reducers/employeeSlice';
 import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, 
     Snackbar, Alert, IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
-    FormControlLabel, Radio } from '@mui/material';
+    FormControlLabel, Radio, InputLabel, Select, List, ListItem, ListItemText } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit } from '@fortawesome/free-regular-svg-icons';
+import { faEdit, faSquarePlus } from '@fortawesome/free-regular-svg-icons';
 
 
-const EmployeeFormModal = ({ employeeId, isEdit }) => {
+const EmployeeFormModal = ({ employeeID, isEdit }) => {
     const [open, setOpen] = useState(false);
     let [formData, setFormData] = useState({
-        employeeId: "",
-        firstName: "",
-        lastName: "",
-        gender: "",
-        dateOfBirth: "",
         aadhaarNumber: "",
-        panNumber: "",
-        contactNumber: "",
-        bloodGroup: "",
-        personalEmail: "",
-        alternativeContactNumber: "",
-        alternativeEmail: "",
-        emergencyContactName: "",
-        emergencyContactRelation: "",
-        emergencyContactId: "",
-        emergencyContactNumber: "",
+        accountNumber: "",
         addressLine1: "",
         addressLine2: "",
-        state: "",
-        city: "",
-        zip: "",
-        landmark: "",
-        highestDegree: "",
-        lastCompanyName: "",
+        alternativeContactNumber: "",
+        alternativeEmail: "",
+        backgroundVerificationAgencyName: "",
         bankName: "",
-        bankAccountNumber: "",
+        bloodGroup: "",
+        city: "",
+        contactNumber: "",
+        createdByID: 0,
+        createdDate: "",
+        dateOfBirth: "",
+        emergencyContactName: "",
+        emergencyContactNumber: "",
+        emergencyContactPersonID: "",
+        emergencyContactRelation: "",
+        employeeID: 0,
+        firstName: "",
+        gender: "",
+        highestDegreeEarned: "",
         ifscCode: "",
-        uanNumber: "",
-        insurancePolicyNumber: "",
-        insuranceCompanyName: "",
-        insuranceStartDate: "",
         insuranceEndDate: "",
-        hasBackgroundVerification: "No",
-        agencyName: "",
-        hasPhysicalVerificationDone: "No"
+        insurancePolicyNumber: "",
+        insuranceStartDate: "",
+        insurerName: "",
+        isBackgroundVerificationCompleted: true,
+        isPhysicalVerificationCompleted: true,
+        landmark: "",
+        lastName: "",
+        modifiedByID: 1,
+        modifiedDate: "",
+        panNumber: "",
+        personalEmailID: "",
+        previousOrgName: "",
+        state: "",
+        uanNumber: "",
+        zip: ""
     });
     const [touched, setTouched] = useState({});
 
@@ -58,15 +62,18 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
     const [snackbarMessage, setSnackbarMessage] = useState('');
     const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
 
+    const [documentType, setDocumentType] = useState('');
+    const [uploadedFile, setUploadedFile] = useState(null);
+
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (isEdit && employeeId) {
-            dispatch(fetchEmployeeById(employeeId)).then((response) => {
+        if (isEdit && employeeID && open) {
+            dispatch(fetchEmployeeById(employeeID)).then((response) => {
                 setFormData(response.payload);
             });
         }
-    }, [dispatch]);
+    }, [dispatch, employeeID, isEdit, open]);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -77,6 +84,20 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
         }
         setSnackbarOpen(false);
     };
+
+    const handleFileUpload = (e) => {
+        const file = e.target.files?.[0] || null;
+        setUploadedFile(file);
+    };
+
+    const handleDocumentTypeChange = (e) => {
+        setDocumentType(e.target.value);
+        setUploadedFile(null);
+    }
+
+    const handleAddAttachmentFile = () => {
+
+    }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -106,7 +127,7 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
     };
 
     const isFieldValid = (field) => {
-        if (field === "personalEmail" || field === "alternativeEmail") {
+        if (field === "personalEmailID" || field === "alternativeEmail") {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           return emailRegex.test(formData[field]);
         }
@@ -136,10 +157,11 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                 panNumber: formData.panNumber,
                 contactNumber: formData.contactNumber,
                 bloodGroup: formData.bloodGroup,
-                personalEmail: formData.personalEmail
+                personalEmailID: formData.personalEmailID
             }
-            if (isEdit && employeeId) {
-                let data = await dispatch(updateEmployeePersonalInformation(...piData, ...{employeeId}));
+            if (isEdit && employeeID) {
+                let reqObj = {...piData, employeeID};
+                let data = await dispatch(updateEmployeePersonalInformation(reqObj));
                 setSnackbarMessage('Employee Personal Information updated successfully!');
                 setSnackbarSeverity('success');
             } else {
@@ -174,8 +196,8 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                 highestDegree: formData.highestDegree,
                 lastCompanyName: formData.lastCompanyName
             }
-            if (isEdit && employeeId) {
-                let data = await dispatch(updateEmployeeContactInformation(...ciData, ...{employeeId}));
+            if (isEdit && employeeID) {
+                let data = await dispatch(updateEmployeeContactInformation(...ciData, employeeID));
                 setSnackbarMessage('Employee Contact Information updated successfully!');
                 setSnackbarSeverity('success');
             }
@@ -200,8 +222,8 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                 insuranceStartDate: formData.insuranceStartDate,
                 insuranceEndDate: formData.insuranceEndDate
             }
-            if (isEdit && employeeId) {
-                let data = await dispatch(updateEmployeeFinancialDetails(...fdData, ...{employeeId}));
+            if (isEdit && employeeID) {
+                let data = await dispatch(updateEmployeeFinancialDetails(...fdData, ...{employeeID}));
                 setSnackbarMessage('Employee Financial Details updated successfully!');
                 setSnackbarSeverity('success');
             }
@@ -222,8 +244,8 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                 agencyName: formData.agencyName,
                 hasPhysicalVerificationDone: formData.hasPhysicalVerificationDone
             }
-            if (isEdit && employeeId) {
-                let data = await dispatch(updateEmployeeAdminSection(...aData, ...{employeeId}));
+            if (isEdit && employeeID) {
+                let data = await dispatch(updateEmployeeAdminSection(...aData, employeeID));
                 setSnackbarMessage('Employee Admin Section updated successfully!');
                 setSnackbarSeverity('success');
             }
@@ -241,7 +263,7 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
     return (
         <div>
             {
-                isEdit && employeeId ? 
+                isEdit && employeeID ? 
                 (
                     <IconButton
                         color="primary"
@@ -270,7 +292,7 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                         <Grid size={6} sx={{ textAlign: 'right'}}>
                             <CloseRoundedIcon style={{ 'color': "red", 'cursor' : "pointer"}} onClick={handleClose} />
                         </Grid>
-                        <Tabs selected={0} isReadOnly={!(employeeId && isEdit)}>
+                        <Tabs selected={0} isReadOnly={!(employeeID && isEdit)}>
                             <Panel title="Personal Information">
                                 <Grid container rowSpacing={2} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
                                     <Grid size={5} sx={{ marginTop: 1 }}>
@@ -420,13 +442,13 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                                         label="Personal Email ID"
                                         variant="outlined"
                                         size="small"
-                                        name="personalEmail"
-                                        value={formData.personalEmail}
+                                        name="personalEmailID"
+                                        value={formData.personalEmailID}
                                         onChange={handleChange}
                                         onBlur={handleBlur}
                                         required
-                                        error={!isFieldValid("personalEmail") && touched.personalEmail}
-                                        helperText={getFieldError("personalEmail")}
+                                        error={!isFieldValid("personalEmailID") && touched.personalEmailID}
+                                        helperText={getFieldError("personalEmailID")}
                                         />
                                     </Grid>
                                     <Grid size={10} sx={{ mt: 2, mb: 2 }}>
@@ -436,7 +458,7 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                                                 size="small"
                                                 color="primary"
                                                 onClick={() => handlePISave("PI")}
-                                                disabled={!isPanelValid(["firstName", "lastName", "gender", "dateOfBirth", "aadhaarNumber", "panNumber", "contactNumber", "bloodGroup", "personalEmail"])}
+                                                disabled={!isPanelValid(["firstName", "lastName", "gender", "dateOfBirth", "aadhaarNumber", "panNumber", "contactNumber", "bloodGroup", "personalEmailID"])}
                                             >
                                             Save
                                             </Button>
@@ -701,7 +723,7 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                                 </Grid>
                             </Panel>
                             <Panel title="Financial Details">
-                            <Grid container rowSpacing={1} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
+                                <Grid container rowSpacing={1} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
                                 <Typography variant="h7" sx={{ fontWeight: 900 }}>Bank Account Details</Typography>
                                 <Grid container rowSpacing={1} columnSpacing={3} size={12}>
                                     <Grid size={5}>
@@ -936,7 +958,66 @@ const EmployeeFormModal = ({ employeeId, isEdit }) => {
                                     }
                                 </Grid>
                             </Panel>
-                            <Panel title="Uploads"></Panel>
+                            <Panel title="Uploads">
+                                <Grid container rowSpacing={0} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
+                                    <Typography variant="h7" sx={{ fontWeight: 900 }}>Upload Employee Documents</Typography>
+                                    <Grid container rowSpacing={0} columnSpacing={3} size={12} sx={{mt: 2}}>
+                                        <Grid size={5}>
+                                            <FormControl fullWidth >
+                                                <InputLabel id="document-type-label">Document Type</InputLabel>
+                                                <Select
+                                                    size="small"
+                                                    labelId="document-type-label"
+                                                    id="document-type"
+                                                    label="Document Type"
+                                                    value={documentType}
+                                                    onChange={ handleDocumentTypeChange }
+                                                >
+                                                    <MenuItem value="adhaar">Adhaar</MenuItem>
+                                                    <MenuItem value="pan">PAN</MenuItem>
+                                                    <MenuItem value="payslips">Payslips</MenuItem>
+                                                    <MenuItem value="educationCertificates">Education Certificates</MenuItem>
+                                                    <MenuItem value="previousExperienceCertificates">Previous Experience Certificates</MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid size={3}>
+                                            <TextField 
+                                                fullWidth
+                                                size="small"
+                                                disabled
+                                                value={uploadedFile ? uploadedFile.name : ''}
+                                                placeholder="No file chosen"
+                                                sx={{ mt: 0, mb: 0 }}
+                                            />
+                                        </Grid>
+                                        <Grid size={2}>
+                                            <Button 
+                                                variant="contained" 
+                                                component="label"
+                                                disabled={documentType === ""}
+                                            >
+                                                Browse
+                                                <input 
+                                                    type="file" 
+                                                    hidden 
+                                                    onChange={handleFileUpload}
+                                                />
+                                            </Button>
+                                        </Grid>
+                                        <Grid size={1}>
+                                            <FontAwesomeIcon icon={faSquarePlus}
+                                                size='2x'
+                                                color={ (documentType && uploadedFile) ? 'green' : 'gray' }
+                                                onClick={handleAddAttachmentFile}
+                                                style={{ cursor: (documentType && uploadedFile) ? "pointer" : "default"}}
+                                                disabled={!(documentType || uploadedFile)}
+                                            />
+                                        </Grid>
+                                    </Grid>
+                                    <Typography variant="h7" sx={{ fontWeight: 900, mt:3 }}>Uploaded Documents</Typography>
+                                </Grid>
+                            </Panel>
                             <Panel title="Activation"></Panel>
                         </Tabs>
                     </Grid>
