@@ -4,16 +4,17 @@ import { fetchEmployeeById, addEmployee, updateEmployeePersonalInformation,
     updateEmployeeContactInformation, updateEmployeeFinancialDetails, 
     updateEmployeeAdminSection } from '../../store/reducers/employeeSlice';
 import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, 
-    Snackbar, Alert, IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
-    FormControlLabel, Radio, InputLabel, Select, List, ListItem, ListItemText } from '@mui/material';
+    IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
+    FormControlLabel, Radio, InputLabel, Select } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquarePlus } from '@fortawesome/free-regular-svg-icons';
+import { formatDate } from '../../unitls/dateUtils';
 
 
-const EmployeeFormModal = ({ employeeID, isEdit }) => {
+const EmployeeFormModal = ({ employeeID }) => {
     const [open, setOpen] = useState(false);
     let [formData, setFormData] = useState({
         aadhaarNumber: "",
@@ -58,32 +59,22 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
     });
     const [touched, setTouched] = useState({});
 
-    const [snackbarOpen, setSnackbarOpen] = useState(false);
-    const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [snackbarSeverity, setSnackbarSeverity] = useState('success'); // 'success' or 'error'
-
     const [documentType, setDocumentType] = useState('');
     const [uploadedFile, setUploadedFile] = useState(null);
 
+    const [attachments, setAttachments] = useState([]);
     const dispatch = useDispatch();
 
     useEffect(() => {
-        if (isEdit && employeeID && open) {
+        if (employeeID && open) {
             dispatch(fetchEmployeeById(employeeID)).then((response) => {
                 setFormData(response.payload);
             });
         }
-    }, [dispatch, employeeID, isEdit, open]);
+    }, [dispatch, employeeID, open]);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
-
-    const handleSnackbarClose = (event, reason) => {
-        if (reason === 'clickaway') {
-            return;
-        }
-        setSnackbarOpen(false);
-    };
 
     const handleFileUpload = (e) => {
         const file = e.target.files?.[0] || null;
@@ -96,7 +87,11 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
     }
 
     const handleAddAttachmentFile = () => {
-
+        if(uploadedFile && documentType) {
+            setAttachments([...attachments, {uploadedFile, documentType}]);
+            setUploadedFile(null);
+            setDocumentType('');
+        }
     }
 
     const handleChange = (e) => {
@@ -159,21 +154,15 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                 bloodGroup: formData.bloodGroup,
                 personalEmailID: formData.personalEmailID
             }
-            if (isEdit && employeeID) {
+            if (employeeID) {
                 let reqObj = {...piData, employeeID};
                 let data = await dispatch(updateEmployeePersonalInformation(reqObj));
-                setSnackbarMessage('Employee Personal Information updated successfully!');
-                setSnackbarSeverity('success');
             } else {
                 let data = await dispatch(addEmployee(piData));
-                setSnackbarMessage('Employee added successfully!');
-                setSnackbarSeverity('success');
             }
         } catch(err){
-            setSnackbarMessage(err.message || "Failed to update employee's Personal Information!");
-            setSnackbarSeverity('error');
+            
         } finally {
-            setSnackbarOpen(true);
             handleClose();
         }
     };
@@ -191,21 +180,17 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                 alternativeEmail: formData.alternativeEmail,
                 emergencyContactName: formData.emergencyContactName,
                 emergencyContactRelation: formData.emergencyContactRelation,
-                emergencyContactId: formData.emergencyContactId,
+                emergencyContactPersonID: formData.emergencyContactPersonID,
                 emergencyContactNumber: formData.emergencyContactNumber,
-                highestDegree: formData.highestDegree,
-                lastCompanyName: formData.lastCompanyName
+                highestDegreeEarned: formData.highestDegreeEarned,
+                previousOrgName: formData.previousOrgName
             }
-            if (isEdit && employeeID) {
+            if (employeeID) {
                 let data = await dispatch(updateEmployeeContactInformation(...ciData, employeeID));
-                setSnackbarMessage('Employee Contact Information updated successfully!');
-                setSnackbarSeverity('success');
             }
         } catch(err){
-            setSnackbarMessage(err.message || "Failed to update employee's Contact Information");
-            setSnackbarSeverity('error');
+
         } finally {
-            setSnackbarOpen(true);
             handleClose();
         }
     }
@@ -214,25 +199,21 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
         try{
             const fdData = {
                 bankName: formData.bankName,
-                bankAccountNumber: formData.bankAccountNumber,
+                accountNumber: formData.accountNumber,
                 ifscCode: formData.ifscCode,
                 uanNumber: formData.uanNumber,
                 insurancePolicyNumber: formData.insurancePolicyNumber,
-                insuranceCompanyName: formData.insuranceCompanyName,
+                insurerName: formData.insurerName,
                 insuranceStartDate: formData.insuranceStartDate,
                 insuranceEndDate: formData.insuranceEndDate
             }
-            if (isEdit && employeeID) {
+            if (employeeID) {
                 let data = await dispatch(updateEmployeeFinancialDetails(...fdData, ...{employeeID}));
-                setSnackbarMessage('Employee Financial Details updated successfully!');
-                setSnackbarSeverity('success');
             }
         }
         catch(err){
-            setSnackbarMessage(err.message || "Failed to update employee's Financial Details!");
-            setSnackbarSeverity('error');
+            
         } finally {
-            setSnackbarOpen(true);
             handleClose();
         }
     }
@@ -244,17 +225,13 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                 agencyName: formData.agencyName,
                 hasPhysicalVerificationDone: formData.hasPhysicalVerificationDone
             }
-            if (isEdit && employeeID) {
+            if (employeeID) {
                 let data = await dispatch(updateEmployeeAdminSection(...aData, employeeID));
-                setSnackbarMessage('Employee Admin Section updated successfully!');
-                setSnackbarSeverity('success');
             }
         }
         catch(err){
-            setSnackbarMessage(err.message || "Failed to update employee's Admin Section!");
-            setSnackbarSeverity('error');
+            
         } finally {
-            setSnackbarOpen(true);
             handleClose();
         }
     }
@@ -263,7 +240,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
     return (
         <div>
             {
-                isEdit && employeeID ? 
+                employeeID ? 
                 (
                     <IconButton
                         color="primary"
@@ -292,7 +269,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                         <Grid size={6} sx={{ textAlign: 'right'}}>
                             <CloseRoundedIcon style={{ 'color': "red", 'cursor' : "pointer"}} onClick={handleClose} />
                         </Grid>
-                        <Tabs selected={0} isReadOnly={!(employeeID && isEdit)}>
+                        <Tabs selected={0} isReadOnly={!(employeeID)}>
                             <Panel title="Personal Information">
                                 <Grid container rowSpacing={2} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
                                     <Grid size={5} sx={{ marginTop: 1 }}>
@@ -355,7 +332,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                             type="date"
                                             slotProps={{ inputLabel: { shrink: true } }}
                                             name="dateOfBirth"
-                                            value={formData.dateOfBirth}
+                                            value={formatDate(formData.dateOfBirth)}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             required
@@ -469,7 +446,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                             <Panel title="Contact Information">
                                 <Grid container rowSpacing={1} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
                                     <Typography variant="h7" sx={{ fontWeight: 900 }}>Address</Typography>
-                                    <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                    <Grid container rowSpacing={2} columnSpacing={3} size={12}>
                                         <Grid size={5}>
                                             <TextField
                                                 fullWidth
@@ -491,6 +468,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 fullWidth
                                                 label="Address Line 2"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
                                                 name="addressLine2"
                                                 value={formData.addressLine2}
@@ -519,6 +497,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 fullWidth
                                                 label="City"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
                                                 name="city"
                                                 value={formData.city}
@@ -535,6 +514,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 fullWidth
                                                 label="Zip"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
                                                 name="zip"
                                                 value={formData.zip}
@@ -551,6 +531,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 fullWidth
                                                 label="Landmark"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
                                                 name="landmark"
                                                 value={formData.landmark}
@@ -564,7 +545,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                         </Grid>
                                     </Grid>
                                     <Typography variant="h7" sx={{ fontWeight: 900 }}>Alternative Contact Number</Typography>
-                                    <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                    <Grid container rowSpacing={2} columnSpacing={3} size={12}>
                                         <Grid size={5}>
                                             <TextField
                                                 fullWidth
@@ -579,7 +560,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 error={touched.alternativeContactNumber && (!/^\d{10}$/.test(formData.alternativeContactNumber) || formData.alternativeContactNumber.length !== 10)}
                                                 helperText={touched.alternativeContactNumber && (!/^\d{10}$/.test(formData.alternativeContactNumber) || formData.alternativeContactNumber.length !== 10) ? "Alternative Contact Number must be a 10-digit number" : ""}  
                                                 type='number'
-                                                slotProps={{ htmlInput: { maxLength: 10 } }}
+                                                slotProps={{ htmlInput: { maxLength: 10 }, inputLabel: { shrink: true } }}
                                             />
                                         </Grid>
                                         <Grid size={5}>
@@ -587,6 +568,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 fullWidth
                                                 label="Alternative Email"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
                                                 name="alternativeEmail"
                                                 value={formData.alternativeEmail}
@@ -599,12 +581,13 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                         </Grid>
                                     </Grid>
                                     <Typography variant="h7" sx={{ fontWeight: 900 }}>Emergency Contact Section</Typography>
-                                    <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                    <Grid container rowSpacing={2} columnSpacing={3} size={12}>
                                         <Grid size={5}>
                                             <TextField
                                                 fullWidth
                                                 label="Emergency Contact Name"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
                                                 name="emergencyContactName"
                                                 value={formData.emergencyContactName}
@@ -621,6 +604,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 fullWidth
                                                 label="Emergency Contact Relation"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
                                                 name="emergencyContactRelation"
                                                 value={formData.emergencyContactRelation}
@@ -637,14 +621,15 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 fullWidth
                                                 label="Emergency Contact ID"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
-                                                name="emergencyContactId"
-                                                value={formData.emergencyContactId}
+                                                name="emergencyContactPersonID"
+                                                value={formData.emergencyContactPersonID}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("emergencyContactId") && touched.emergencyContactId}
-                                                helperText={getFieldError("emergencyContactId")}
+                                                error={!isFieldValid("emergencyContactPersonID") && touched.emergencyContactPersonID}
+                                                helperText={getFieldError("emergencyContactPersonID")}
                                                 maxLength={80}
                                             />
                                         </Grid>
@@ -662,25 +647,26 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 error={touched.emergencyContactNumber && (!/^\d{10}$/.test(formData.emergencyContactNumber) || formData.emergencyContactNumber.length !== 10)}
                                                 helperText={touched.emergencyContactNumber && (!/^\d{10}$/.test(formData.emergencyContactNumber) || formData.emergencyContactNumber.length !== 10) ? "Emergency Contact Number must be a 10-digit number" : ""}  
                                                 type='number'
-                                                slotProps={{ htmlInput: { maxLength: 10 } }}
+                                                slotProps={{ htmlInput: { maxLength: 10 }, inputLabel: { shrink: true } }}
                                             />
                                         </Grid>
                                     </Grid>
                                     <Typography variant="h7" sx={{ fontWeight: 900 }}>Other Info</Typography>
-                                    <Grid container rowSpacing={1} columnSpacing={3} size={12}>
+                                    <Grid container rowSpacing={2} columnSpacing={3} size={12}>
                                         <Grid size={5}>
                                             <TextField
                                                 fullWidth
                                                 label="Highest Degree Earned"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
-                                                name="highestDegree"
-                                                value={formData.highestDegree}
+                                                name="highestDegreeEarned"
+                                                value={formData.highestDegreeEarned}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("highestDegree") && touched.highestDegree}
-                                                helperText={getFieldError("highestDegree")}
+                                                error={!isFieldValid("highestDegreeEarned") && touched.highestDegreeEarned}
+                                                helperText={getFieldError("highestDegreeEarned")}
                                                 maxLength={80}
                                             />
                                         </Grid>
@@ -689,20 +675,21 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                 fullWidth
                                                 label="Last Company Name"
                                                 variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
-                                                name="lastCompanyName"
-                                                value={formData.lastCompanyName}
+                                                name="previousOrgName"
+                                                value={formData.previousOrgName}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("lastCompanyName") && touched.lastCompanyName}
-                                                helperText={getFieldError("lastCompanyName")}
+                                                error={!isFieldValid("previousOrgName") && touched.previousOrgName}
+                                                helperText={getFieldError("previousOrgName")}
                                                 maxLength={80}
                                             />
                                         </Grid>
                                     </Grid>
                                     {
-                                        isEdit && (
+                                        employeeID && (
                                         <Grid size={10} sx={{ mt: 2, mb: 2 }} >
                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                                 <Button
@@ -712,7 +699,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                                     onClick={() => handleCISave()}
                                                     disabled={!isPanelValid(["addressLine1", "addressLine2", "state", "city", "zip", "landmark", 
                                                         "alternativeContactNumber", "alternativeEmail", "emergencyContactName", "emergencyContactRelation", 
-                                                        "emergencyContactId", "emergencyContactNumber", "highestDegree", "lastCompanyName" ])}
+                                                        "emergencyContactPersonID", "emergencyContactNumber", "highestDegreeEarned", "previousOrgName" ])}
                                                 >
                                                     Save
                                                 </Button>
@@ -724,165 +711,168 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                             </Panel>
                             <Panel title="Financial Details">
                                 <Grid container rowSpacing={1} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
-                                <Typography variant="h7" sx={{ fontWeight: 900 }}>Bank Account Details</Typography>
-                                <Grid container rowSpacing={1} columnSpacing={3} size={12}>
-                                    <Grid size={5}>
+                                    <Typography variant="h7" sx={{ fontWeight: 900 }}>Bank Account Details</Typography>
+                                    <Grid container rowSpacing={2} columnSpacing={3} size={12}>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Bank Name"
+                                                variant="outlined"
+                                                size="small"
+                                                name="bankName"
+                                                value={formData.bankName}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                slotProps={{ inputLabel: { shrink: true } }}
+                                                error={!isFieldValid("bankName") && touched.bankName}
+                                                helperText={getFieldError("bankName")}
+                                                maxLength={100}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Bank Account Number"
+                                                variant="outlined"
+                                                slotProps={{ inputLabel: { shrink: true } }}
+                                                size="small"
+                                                name="accountNumber"
+                                                value={formData.accountNumber}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("accountNumber") && touched.accountNumber}
+                                                helperText={getFieldError("accountNumber")}
+                                                maxLength={50}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
                                         <TextField
                                             fullWidth
-                                            label="Bank Name"
+                                            label="IFSC code"
                                             variant="outlined"
                                             size="small"
-                                            name="bankName"
-                                            value={formData.bankName}
+                                            name="ifscCode"
+                                            value={formData.ifscCode}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             required
-                                            error={!isFieldValid("bankName") && touched.bankName}
-                                            helperText={getFieldError("bankName")}
-                                            maxLength={100}
-                                        />
-                                    </Grid>
-                                    <Grid size={5}>
-                                        <TextField
-                                            fullWidth
-                                            label="Bank Account Number"
-                                            variant="outlined"
-                                            size="small"
-                                            name="bankAccountNumber"
-                                            value={formData.bankAccountNumber}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            required
-                                            error={!isFieldValid("bankAccountNumber") && touched.bankAccountNumber}
-                                            helperText={getFieldError("bankAccountNumber")}
+                                            error={!isFieldValid("ifscCode") && touched.ifscCode}
+                                            helperText={getFieldError("ifscCode")}
                                             maxLength={50}
                                         />
+                                        </Grid>
                                     </Grid>
-                                    <Grid size={5}>
-                                    <TextField
-                                        fullWidth
-                                        label="IFSC code"
-                                        variant="outlined"
-                                        size="small"
-                                        name="ifscCode"
-                                        value={formData.ifscCode}
-                                        onChange={handleChange}
-                                        onBlur={handleBlur}
-                                        required
-                                        error={!isFieldValid("ifscCode") && touched.ifscCode}
-                                        helperText={getFieldError("ifscCode")}
-                                        maxLength={50}
-                                    />
+                                    <Typography variant="h7" sx={{ fontWeight: 900, mt:3 }}>PF Details</Typography>
+                                    <Grid container rowSpacing={2} columnSpacing={3} size={12}>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="UAN Number"
+                                                variant="outlined"
+                                                size="small"
+                                                name="uanNumber"
+                                                value={formData.uanNumber}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("uanNumber") && touched.uanNumber}
+                                                helperText={getFieldError("uanNumber")}
+                                                maxLength={50}
+                                            />
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                                <Typography variant="h7" sx={{ fontWeight: 900 }}>PF Details</Typography>
-                                <Grid container rowSpacing={1} columnSpacing={3} size={12}>
-                                    <Grid size={5}>
-                                        <TextField
-                                            fullWidth
-                                            label="UAN Number"
-                                            variant="outlined"
-                                            size="small"
-                                            name="uanNumber"
-                                            value={formData.uanNumber}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            required
-                                            error={!isFieldValid("uanNumber") && touched.uanNumber}
-                                            helperText={getFieldError("uanNumber")}
-                                            maxLength={50}
-                                        />
+                                    <Typography variant="h7" sx={{ fontWeight: 900, mt:3 }}>Insurance Details</Typography>
+                                    <Grid container rowSpacing={2} columnSpacing={3} size={12}>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Insurance Policy Number"
+                                                variant="outlined"
+                                                size="small"
+                                                name="insurancePolicyNumber"
+                                                value={formData.insurancePolicyNumber}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("insurancePolicyNumber") && touched.insurancePolicyNumber}
+                                                helperText={getFieldError("insurancePolicyNumber")}
+                                                maxLength={50}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Insurance Company Name"
+                                                variant="outlined"
+                                                size="small"
+                                                slotProps={{ inputLabel: { shrink: true } }}
+                                                name="insurerName"
+                                                value={formData.insurerName}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("insurerName") && touched.insurerName}
+                                                helperText={getFieldError("insurerName")}
+                                                maxLength={50}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Insurance Start Date"
+                                                variant="outlined"
+                                                size="small"
+                                                type="date"
+                                                slotProps={{ inputLabel: { shrink: true } }}
+                                                name="insuranceStartDate"
+                                                value={formData.insuranceStartDate}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("insuranceStartDate") && touched.insuranceStartDate}
+                                                helperText={getFieldError("insuranceStartDate")}
+                                            />
+                                        </Grid>
+                                        <Grid size={5}>
+                                            <TextField
+                                                fullWidth
+                                                label="Insurance End Date"
+                                                variant="outlined"
+                                                size="small"
+                                                type="date"
+                                                slotProps={{ inputLabel: { shrink: true } }}
+                                                name="insuranceEndDate"
+                                                value={formData.insuranceEndDate}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                required
+                                                error={!isFieldValid("insuranceEndDate") && touched.insuranceEndDate}
+                                                helperText={getFieldError("insuranceEndDate")}
+                                            />
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                                <Typography variant="h7" sx={{ fontWeight: 900 }}>Insurance Details</Typography>
-                                <Grid container rowSpacing={3} columnSpacing={3} size={12}>
-                                    <Grid size={5}>
-                                        <TextField
-                                            fullWidth
-                                            label="Insurance Policy Number"
-                                            variant="outlined"
-                                            size="small"
-                                            name="insurancePolicyNumber"
-                                            value={formData.insurancePolicyNumber}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            required
-                                            error={!isFieldValid("insurancePolicyNumber") && touched.insurancePolicyNumber}
-                                            helperText={getFieldError("insurancePolicyNumber")}
-                                            maxLength={50}
-                                        />
+                                    {
+                                        employeeID && (
+                                        <Grid size={10} sx={{ mt: 2, mb: 2 }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                color="primary"
+                                                onClick={() => handleFDSave()}
+                                                disabled={!isPanelValid(["bankName", "accountNumber", "ifscCode", 
+                                                    "uanNumber", "insurancePolicyNumber", "insurerName", 
+                                                    "insuranceStartDate", "insuranceEndDate", ])}
+                                            >
+                                                Save
+                                            </Button>
+                                            </Box>
+                                        </Grid>
+                                        )
+                                    }
                                     </Grid>
-                                    <Grid size={5}>
-                                        <TextField
-                                            fullWidth
-                                            label="Insurance Company Name"
-                                            variant="outlined"
-                                            size="small"
-                                            name="insuranceCompanyName"
-                                            value={formData.insuranceCompanyName}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            required
-                                            error={!isFieldValid("insuranceCompanyName") && touched.insuranceCompanyName}
-                                            helperText={getFieldError("insuranceCompanyName")}
-                                            maxLength={50}
-                                        />
-                                    </Grid>
-                                    <Grid size={5}>
-                                        <TextField
-                                            fullWidth
-                                            label="Insurance Start Date"
-                                            variant="outlined"
-                                            size="small"
-                                            type="date"
-                                            slotProps={{ inputLabel: { shrink: true } }}
-                                            name="insuranceStartDate"
-                                            value={formData.insuranceStartDate}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            required
-                                            error={!isFieldValid("insuranceStartDate") && touched.insuranceStartDate}
-                                            helperText={getFieldError("insuranceStartDate")}
-                                        />
-                                    </Grid>
-                                    <Grid size={5}>
-                                        <TextField
-                                            fullWidth
-                                            label="Insurance End Date"
-                                            variant="outlined"
-                                            size="small"
-                                            type="date"
-                                            slotProps={{ inputLabel: { shrink: true } }}
-                                            name="insuranceEndDate"
-                                            value={formData.insuranceEndDate}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            required
-                                            error={!isFieldValid("insuranceEndDate") && touched.insuranceEndDate}
-                                            helperText={getFieldError("insuranceEndDate")}
-                                        />
-                                    </Grid>
-                                </Grid>
-                                {
-                                    isEdit && (
-                                    <Grid size={10} sx={{ mt: 2, mb: 2 }}>
-                                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                        <Button
-                                            variant="contained"
-                                            size="small"
-                                            color="primary"
-                                            onClick={() => handleFDSave()}
-                                            disabled={!isPanelValid(["bankName", "bankAccountNumber", "ifscCode", 
-                                                "uanNumber", "insurancePolicyNumber", "insuranceCompanyName", 
-                                                "insuranceStartDate", "insuranceEndDate", ])}
-                                        >
-                                            Save
-                                        </Button>
-                                        </Box>
-                                    </Grid>
-                                    )
-                                }
-                                </Grid>
                             </Panel>
                             <Panel title="Admin Section">
                                 <Grid container rowSpacing={2} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
@@ -940,7 +930,7 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                         </>
                                     }
                                     {
-                                        isEdit && (
+                                        employeeID && (
                                         <Grid size={10} sx={{ mt: 2, mb: 2 }}>
                                             <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                             <Button
@@ -1015,7 +1005,35 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                                             />
                                         </Grid>
                                     </Grid>
-                                    <Typography variant="h7" sx={{ fontWeight: 900, mt:3 }}>Uploaded Documents</Typography>
+                                    <Typography variant="h7" sx={{ fontWeight: 900, mt: 3 }}>Uploaded Documents</Typography>
+                                    <Grid container size={12} sx={{mt:3}}>
+                                        <Grid rowSpacing={2} columnSpacing={3} size={12}>
+                                            <Grid size={2}>
+                                                <Typography>Document Type</Typography> 
+                                            </Grid>
+                                            <Grid size={2}>
+                                                <Typography>Name</Typography>
+                                            </Grid>
+                                            <Grid size={2}>
+                                                <Typography>Type</Typography>
+                                            </Grid>
+                                            <Grid size={2}>
+                                                <Typography>Size</Typography>
+                                            </Grid>
+                                            <Grid size={2}>
+                                                <Typography>Last Modified Date</Typography>
+                                            </Grid>
+                                        </Grid> 
+                                        {attachments.map((attachment, index) => (
+                                            <Grid rowSpacing={2} columnSpacing={3} size={12} key={index}>
+                                                <Grid size={2}>{attachment.documentType}</Grid>
+                                                <Grid size={2}>{attachment.uploadedFile?.name}</Grid>
+                                                <Grid size={2}>{attachment.uploadedFile?.type}</Grid>
+                                                <Grid size={2}>{attachment.uploadedFile?.size}</Grid>
+                                                <Grid size={2}>{attachment.uploadedFile?.lastModifiedDate?.toLocaleDateString()}</Grid>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
                                 </Grid>
                             </Panel>
                             <Panel title="Activation"></Panel>
@@ -1023,16 +1041,6 @@ const EmployeeFormModal = ({ employeeID, isEdit }) => {
                     </Grid>
                 </Box>
             </Modal>
-            <Snackbar
-                open={snackbarOpen}
-                autoHideDuration={6000}
-                onClose={handleSnackbarClose}
-                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
-            >
-                <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                    {snackbarMessage}
-                </Alert>
-            </Snackbar>
         </div>
     )
 }

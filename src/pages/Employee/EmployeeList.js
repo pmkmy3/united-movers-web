@@ -27,10 +27,8 @@ const EmployeeList = () => {
     const dispatch = useDispatch();
 
     const [searchText, setSearchText] = useState('');
-    const [filteredEmployees, setFilteredEmployees] = useState(employees);
+    const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-    const [selectedEmployeeID, setSelectedEmployeeID] = useState(null);
-    const [isEdit, setIsEdit] = useState(false);
 
     useEffect(() => {
         let data = dispatch(fetchEmployees());
@@ -74,7 +72,7 @@ const EmployeeList = () => {
             sortable: false, filterable: false,
             renderCell: (params) => (
                 <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <EmployeeFormModal employeeID={params.row.employeeID} isEdit={true} />
+                    <EmployeeFormModal employeeID={params.row.employeeID} />
                     <IconButton
                         color="secondary"
                         size="small"
@@ -113,7 +111,7 @@ const EmployeeList = () => {
                         />
                     </Grid>
                     <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
-                        <EmployeeFormModal employeeID={selectedEmployeeID} isEdit={isEdit} />
+                        <EmployeeFormModal />
                     </Grid>
                 </Grid>
                 <Box sx={{ minHeight: "100%", width: '100%' }}>
