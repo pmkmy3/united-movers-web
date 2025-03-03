@@ -27,11 +27,13 @@ export const fetchEmployeeById = createAsyncThunk('employees/fetchEmployeeById',
 
 
 export const addEmployee = createAsyncThunk('employees/addEmployee', async (employee) => {
-    const response = await fetch(API_BASE_URL+'Employee', {
-        method: 'POST',
+    const requestOptions = {
+        method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(employee)
-    });
+        body: JSON.stringify(employee),
+        redirect: "follow"
+    };
+    const response = await fetch(API_BASE_URL+'Employee/ValidateAndCreateEmployeeID', requestOptions);
     if (!response.ok) {
         throw new Error('Failed to add employee');
     }
@@ -39,16 +41,22 @@ export const addEmployee = createAsyncThunk('employees/addEmployee', async (empl
 });
 
 export const updateEmployeePersonalInformation = createAsyncThunk('employees/updateEmployeePersonalInformation', async (employeePI) => {
-    let url = `${API_BASE_URL}Employee/${employeePI.employeeID}`;
+    let url = `${API_BASE_URL}Employee/ValidateAndCreateEmployeeID`;
     const response = await fetch(url, {
-        method: 'PUT',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(employeePI)
     });
     if (!response.ok) {
-        throw new Error('Failed to update Employee Personal Information');
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to update Employee Personal Information');
     }
-    return response.json();
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+        return response.json();
+    } else {
+        return { message: await response.text() };
+    }
 });
 
 export const updateEmployeeContactInformation = createAsyncThunk('employees/updateEmployeeContactInformation', async (employeeCI) => {

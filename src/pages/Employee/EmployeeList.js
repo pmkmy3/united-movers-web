@@ -55,6 +55,10 @@ const EmployeeList = () => {
         console.log("Activate", row);
     };
 
+    const reloadGrid = () => {
+        dispatch(fetchEmployees());
+    };
+
     const iconStyle = { color: "black", fontSize: "1.5em" }
 
     const columns = [
@@ -72,7 +76,7 @@ const EmployeeList = () => {
             sortable: false, filterable: false,
             renderCell: (params) => (
                 <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-                    <EmployeeFormModal employeeID={params.row.employeeID} />
+                    <EmployeeFormModal employeeID={params.row.employeeID} reloadGrid={reloadGrid} />
                     <IconButton
                         color="secondary"
                         size="small"
@@ -111,7 +115,7 @@ const EmployeeList = () => {
                         />
                     </Grid>
                     <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
-                        <EmployeeFormModal />
+                        <EmployeeFormModal reloadGrid={reloadGrid} />
                     </Grid>
                 </Grid>
                 <Box sx={{ minHeight: "100%", width: '100%' }}>

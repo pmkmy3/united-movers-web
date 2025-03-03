@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchEmployeeById, addEmployee, updateEmployeePersonalInformation, 
     updateEmployeeContactInformation, updateEmployeeFinancialDetails, 
     updateEmployeeAdminSection } from '../../store/reducers/employeeSlice';
@@ -11,10 +11,9 @@ import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquarePlus } from '@fortawesome/free-regular-svg-icons';
-import { formatDate } from '../../unitls/dateUtils';
 
 
-const EmployeeFormModal = ({ employeeID }) => {
+const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
     const [open, setOpen] = useState(false);
     let [formData, setFormData] = useState({
         aadhaarNumber: "",
@@ -63,7 +62,9 @@ const EmployeeFormModal = ({ employeeID }) => {
     const [uploadedFile, setUploadedFile] = useState(null);
 
     const [attachments, setAttachments] = useState([]);
+    const [updateSuccess, setUpdateSuccess] = useState(false);
     const dispatch = useDispatch();
+    const { loading, error } = useSelector(state => state.employees);
 
     useEffect(() => {
         if (employeeID && open) {
@@ -72,6 +73,14 @@ const EmployeeFormModal = ({ employeeID }) => {
             });
         }
     }, [dispatch, employeeID, open]);
+
+    useEffect(() => {
+        if (updateSuccess) {
+            handleClose();
+            reloadGrid();
+            setUpdateSuccess(false);
+        }
+    }, [updateSuccess, reloadGrid]);
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
@@ -149,19 +158,21 @@ const EmployeeFormModal = ({ employeeID }) => {
                 gender: formData.gender,
                 dateOfBirth: formData.dateOfBirth,
                 aadhaarNumber: formData.aadhaarNumber,
-                panNumber: formData.panNumber,
+                pan: formData.panNumber,
                 contactNumber: formData.contactNumber,
                 bloodGroup: formData.bloodGroup,
-                personalEmailID: formData.personalEmailID
+                personalEmailID: formData.personalEmailID,
+                loggedInUserID: -1
             }
             if (employeeID) {
                 let reqObj = {...piData, employeeID};
-                let data = await dispatch(updateEmployeePersonalInformation(reqObj));
+                await dispatch(updateEmployeePersonalInformation(reqObj));
             } else {
-                let data = await dispatch(addEmployee(piData));
+                await dispatch(addEmployee(piData));
             }
+            setUpdateSuccess(true);
         } catch(err){
-            
+            console.error(err);
         } finally {
             handleClose();
         }
@@ -332,7 +343,7 @@ const EmployeeFormModal = ({ employeeID }) => {
                                             type="date"
                                             slotProps={{ inputLabel: { shrink: true } }}
                                             name="dateOfBirth"
-                                            value={formatDate(formData.dateOfBirth)}
+                                            value={formData.dateOfBirth}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             required
