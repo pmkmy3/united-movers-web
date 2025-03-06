@@ -10,7 +10,7 @@ import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faSquarePlus } from '@fortawesome/free-regular-svg-icons';
+import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-svg-icons';
 
 
 const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
@@ -69,7 +69,15 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
     useEffect(() => {
         if (employeeID && open) {
             dispatch(fetchEmployeeById(employeeID)).then((response) => {
-                setFormData(response.payload);
+                const data = response.payload;
+                setFormData({
+                    ...data,
+                    dateOfBirth: data.dateOfBirth ? data.dateOfBirth.split('T')[0] : "",
+                    createdDate: data.createdDate ? data.createdDate.split('T')[0] : "",
+                    modifiedDate: data.modifiedDate ? data.modifiedDate.split('T')[0] : "",
+                    insuranceStartDate: data.insuranceStartDate ? data.insuranceStartDate.split('T')[0] : "",
+                    insuranceEndDate: data.insuranceEndDate ? data.insuranceEndDate.split('T')[0] : ""
+                });
             });
         }
     }, [dispatch, employeeID, open]);
@@ -101,6 +109,10 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
             setUploadedFile(null);
             setDocumentType('');
         }
+    }
+
+    const handleDeleteAttachment = (index) => {
+        setAttachments(attachments.filter((_, i) => i !== index));
     }
 
     const handleChange = (e) => {
@@ -1016,35 +1028,37 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                             />
                                         </Grid>
                                     </Grid>
-                                    <Typography variant="h7" sx={{ fontWeight: 900, mt: 3 }}>Uploaded Documents</Typography>
-                                    <Grid container size={12} sx={{mt:3}}>
-                                        <Grid rowSpacing={2} columnSpacing={3} size={12}>
-                                            <Grid size={2}>
-                                                <Typography>Document Type</Typography> 
-                                            </Grid>
-                                            <Grid size={2}>
-                                                <Typography>Name</Typography>
-                                            </Grid>
-                                            <Grid size={2}>
-                                                <Typography>Type</Typography>
-                                            </Grid>
-                                            <Grid size={2}>
-                                                <Typography>Size</Typography>
-                                            </Grid>
-                                            <Grid size={2}>
-                                                <Typography>Last Modified Date</Typography>
-                                            </Grid>
-                                        </Grid> 
+                                    <Box gridColumn="span 12" sx={{mt: 6}}>
+                                        <Typography variant="h7" sx={{ fontWeight: 900}}>Uploaded Documents</Typography>
+                                    </Box>
+                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" sx={{mt:3}}>
+                                        <Box gridColumn="span 2">
+                                            <Typography sx={{ fontWeight: 700}}>Document Type</Typography> 
+                                        </Box>
+                                        <Box gridColumn="span 4">
+                                            <Typography sx={{ fontWeight: 700}}>Name</Typography>
+                                        </Box>
+                                        <Box gridColumn="span 2">
+                                            <Typography sx={{ fontWeight: 700}}>Size in KB's</Typography>
+                                        </Box>
+                                        <Box gridColumn="span 3">
+                                            <Typography sx={{ fontWeight: 700}}>Last Modified Date</Typography>
+                                        </Box>
+                                        <Box gridColumn="span 1">
+                                            <Typography>Actions</Typography>
+                                        </Box>
                                         {attachments.map((attachment, index) => (
-                                            <Grid rowSpacing={2} columnSpacing={3} size={12} key={index}>
-                                                <Grid size={2}>{attachment.documentType}</Grid>
-                                                <Grid size={2}>{attachment.uploadedFile?.name}</Grid>
-                                                <Grid size={2}>{attachment.uploadedFile?.type}</Grid>
-                                                <Grid size={2}>{attachment.uploadedFile?.size}</Grid>
-                                                <Grid size={2}>{attachment.uploadedFile?.lastModifiedDate?.toLocaleDateString()}</Grid>
-                                            </Grid>
+                                            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index}>
+                                                <Box gridColumn="span 2"><Typography>{attachment.documentType}</Typography></Box>
+                                                <Box gridColumn="span 4"><Typography>{attachment.uploadedFile?.name}</Typography></Box>
+                                                <Box gridColumn="span 2"><Typography>{attachment.uploadedFile?.size}</Typography></Box>
+                                                <Box gridColumn="span 3"><Typography>{attachment.uploadedFile?.lastModifiedDate?.toLocaleDateString()}</Typography></Box>
+                                                <Box gridColumn="span 1">
+                                                    <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteAttachment(index)} />
+                                                </Box>
+                                            </Box>
                                         ))}
-                                    </Grid>
+                                    </Box>
                                 </Grid>
                             </Panel>
                             <Panel title="Activation"></Panel>
