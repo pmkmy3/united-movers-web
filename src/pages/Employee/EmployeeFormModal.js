@@ -105,9 +105,9 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
 
     const handleAddAttachmentFile = () => {
         if(uploadedFile && documentType) {
-            setAttachments([...attachments, {uploadedFile, documentType}]);
-            setUploadedFile(null);
+            setAttachments([...attachments, {uploadedFile, documentType, lastModifiedDate: new Date()}]);
             setDocumentType('');
+            setUploadedFile(null);
         }
     }
 
@@ -257,6 +257,10 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
         } finally {
             handleClose();
         }
+    }
+
+    const handleUploadSave = async () => {
+        
     }
 
 
@@ -973,6 +977,21 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                             </Panel>
                             <Panel title="Uploads">
                                 <Grid container rowSpacing={0} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
+                                    {/* <Grid container spacing={3} size={12}>
+                                        <Grid size={6}>
+                                            
+                                        </Grid>
+                                        <Grid size={6} sx={{ textAlign: 'right', mt: 1}}>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                color="primary"
+                                                onClick={() => handleUploadSave()}
+                                            >
+                                                Save
+                                            </Button>
+                                        </Grid>
+                                    </Grid> */}
                                     <Typography variant="h7" sx={{ fontWeight: 900 }}>Upload Employee Documents</Typography>
                                     <Grid container rowSpacing={0} columnSpacing={3} size={12} sx={{mt: 2}}>
                                         <Grid size={5}>
@@ -1031,8 +1050,8 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                     <Box gridColumn="span 12" sx={{mt: 6}}>
                                         <Typography variant="h7" sx={{ fontWeight: 900}}>Uploaded Documents</Typography>
                                     </Box>
-                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" sx={{mt:3}}>
-                                        <Box gridColumn="span 2">
+                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" sx={{mt:3, maxHeight: 300}}>
+                                        <Box gridColumn="span 3">
                                             <Typography sx={{ fontWeight: 700}}>Document Type</Typography> 
                                         </Box>
                                         <Box gridColumn="span 4">
@@ -1041,24 +1060,38 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                         <Box gridColumn="span 2">
                                             <Typography sx={{ fontWeight: 700}}>Size in KB's</Typography>
                                         </Box>
-                                        <Box gridColumn="span 3">
+                                        <Box gridColumn="span 2">
                                             <Typography sx={{ fontWeight: 700}}>Last Modified Date</Typography>
                                         </Box>
                                         <Box gridColumn="span 1">
-                                            <Typography>Actions</Typography>
+                                            <Typography sx={{ fontWeight: 700}}>Actions</Typography>
                                         </Box>
                                         {attachments.map((attachment, index) => (
-                                            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index}>
-                                                <Box gridColumn="span 2"><Typography>{attachment.documentType}</Typography></Box>
+                                            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index} sx={{height: 25}}>
+                                                <Box gridColumn="span 3"><Typography>{attachment.documentType}</Typography></Box>
                                                 <Box gridColumn="span 4"><Typography>{attachment.uploadedFile?.name}</Typography></Box>
                                                 <Box gridColumn="span 2"><Typography>{attachment.uploadedFile?.size}</Typography></Box>
-                                                <Box gridColumn="span 3"><Typography>{attachment.uploadedFile?.lastModifiedDate?.toLocaleDateString()}</Typography></Box>
+                                                <Box gridColumn="span 2"><Typography>{attachment.lastModifiedDate?.toLocaleDateString()}</Typography></Box>
                                                 <Box gridColumn="span 1">
                                                     <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteAttachment(index)} />
                                                 </Box>
                                             </Box>
                                         ))}
                                     </Box>
+                                    <Grid container size={12}>
+                                        <Grid size={6}></Grid>
+                                        <Grid size={5} sx={{ textAlign: 'right', m: 2}}>
+                                            <Button
+                                                variant="contained"
+                                                size="small"
+                                                color="primary"
+                                                onClick={() => handleUploadSave()}
+                                            >
+                                                Save
+                                            </Button>
+                                        </Grid>
+
+                                    </Grid>
                                 </Grid>
                             </Panel>
                             <Panel title="Activation"></Panel>
