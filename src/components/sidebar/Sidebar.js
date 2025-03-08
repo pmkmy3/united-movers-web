@@ -5,7 +5,8 @@ import './Sidebar.css'; // Add styling similar to your sidebar CSS
 const Sidebar = ({ isCollapsed, toggleCollapse }) => {
   const menuItems = [
     { path: '/', label: 'Home', icon: '🏠' },
-    { path: '/employee', label: 'Employees List', icon: '📊' }
+    { path: '/employee', label: 'Employees List', icon: '📊' },
+    { path: '/rider', label: 'Riders List', icon: '📊' }
   ];
 
   return (

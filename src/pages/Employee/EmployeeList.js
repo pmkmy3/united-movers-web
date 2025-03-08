@@ -31,23 +31,29 @@ const EmployeeList = () => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
 
     useEffect(() => {
-        let data = dispatch(fetchEmployees());
+        dispatch(fetchEmployees());
     }, [dispatch]);
 
     useEffect(() => {
         setFilteredEmployees(employees);
     }, [employees]);
 
-    const handleSearch = (event) => {
-        const value = event.target.value.toLowerCase();
-        setSearchText(value);
-        setFilteredEmployees(
-            employees.filter((employee) =>
+    useEffect(() => {
+        if (searchText !== '' && searchText.length >= 3) {
+            const value = searchText.toLowerCase();
+            const filteredData = employees.filter((employee) =>
                 Object.keys(employee).some((key) =>
                     String(employee[key]).toLowerCase().includes(value)
                 )
-            )
-        );
+            );
+            setFilteredEmployees(filteredData);
+        } else {
+            setFilteredEmployees(employees);
+        }
+    }, [searchText, employees]);
+
+    const handleSearch = (event) => {
+        setSearchText(event.target.value);
     };
 
     const handleActivate = (row) => {

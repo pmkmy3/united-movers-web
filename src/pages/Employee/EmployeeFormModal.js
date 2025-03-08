@@ -64,7 +64,6 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
     const [attachments, setAttachments] = useState([]);
     const [updateSuccess, setUpdateSuccess] = useState(false);
     const dispatch = useDispatch();
-    const { loading, error } = useSelector(state => state.employees);
 
     useEffect(() => {
         if (employeeID && open) {
