@@ -63,6 +63,7 @@ const RiderList = () => {
         { field: 'dateOfBirth', headerName: 'DOB', flex: 0.6, sortable: true },
         { field: 'emailId', headerName: 'Email', flex: 1 },
         { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6 },
+        { field: 'aadharCardNumber', headerName: 'Aadhaar Number', flex: 0.6  },
         { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
         { field: 'vendorName', headerName: 'Vendor Name', flex: 1 },
         { field: 'referenceName', headerName: 'Reference Name', flex: 1 },
@@ -94,7 +95,62 @@ const RiderList = () => {
     return (
         <Container component="main" maxWidth={false} sx={{ maxwidth: '100%'  }}>
             <CssBaseline />
-
+            <Box sx={{ mt: 0 }}>
+                <Typography component="h3" variant="h5">
+                    Riders
+                </Typography>
+                <Grid container spacing={3}>
+                    <Grid size={6}>
+                        <TextField
+                            variant="outlined"
+                            margin="normal"
+                            size="small"
+                            id="search"
+                            label="Search"
+                            name="search"
+                            autoComplete="off"
+                            onChange={handleSearch}
+                            sx={{ width: '50%' }}
+                        />
+                    </Grid>
+                    <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
+                        <RiderFormModal reloadGrid={reloadGrid} />
+                    </Grid>
+                </Grid>
+                <Box sx={{ minHeight: "100%", width: '100%' }}>
+                    <DataGrid
+                        getRowId={(row) => row.riderID}
+                        rows={filteredRiders}
+                        columns={columns}
+                        paginationModel={paginationModel}
+                        onPaginationModelChange={setPaginationModel}
+                        pageSizeOptions={[5, 10, 20, 50]}
+                        paginationMode="client"
+                        rowCount={filteredRiders.length}
+                        disableRowSelectionOnClick
+                        rowHeight={35}
+                        components={{
+                            Toolbar: CustomToolbar,
+                        }}
+                        sx={{
+                            "& .MuiDataGrid-footerContainer": {
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              flexWrap: "nowrap"
+                            },
+                            "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+                                margin: "0 8px"
+                            },
+                            "& .MuiTablePagination-toolbar": {
+                                alignItems: "center", // Ensures vertical centering of the pagination toolbar content
+                                display: "flex",
+                                flexWrap: "nowrap"
+                            }
+                        }}
+                    />
+                </Box>
+            </Box>
         </Container>
     )
 
