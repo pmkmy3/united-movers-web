@@ -33,7 +33,8 @@ export const addEmployee = createAsyncThunk('employees/addEmployee', async (empl
         body: JSON.stringify(employee),
         redirect: "follow"
     };
-    const response = await fetch(API_BASE_URL+'Employee/ValidateAndCreateEmployeeID', requestOptions);
+    let url = `${API_BASE_URL}'Employee/ValidateAndCreateEmployeeID`;
+    const response = await fetch(url, requestOptions);
     if (!response.ok) {
         throw new Error('Failed to add employee');
     }
@@ -60,7 +61,8 @@ export const updateEmployeePersonalInformation = createAsyncThunk('employees/upd
 });
 
 export const updateEmployeeContactInformation = createAsyncThunk('employees/updateEmployeeContactInformation', async (employeeCI) => {
-    const response = await fetch(`${API_BASE_URL}/${employeeCI.employeeID}`, {
+    let url = `${API_BASE_URL}Employee/UpdateContactInformation`;
+    const response = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(employeeCI)
@@ -72,7 +74,8 @@ export const updateEmployeeContactInformation = createAsyncThunk('employees/upda
 });
 
 export const updateEmployeeFinancialDetails = createAsyncThunk('employees/updateEmployeeFinancialDetails', async (employeeFD) => {
-    const response = await fetch(`${API_BASE_URL}/${employeeFD.employeeID}`, {
+    let url = `${API_BASE_URL}Employee/UpdateFinancialDetails`;
+    const response = await fetch(url, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(employeeFD)
@@ -97,7 +100,7 @@ export const updateEmployeeAdminSection = createAsyncThunk('employees/updateEmpl
 
 const employeeSlice = createSlice({ 
     name: 'employees', 
-    initialState: { employees: [], loading: false, error: null },
+    initialState: { employees: [], loading: false, error: '', successMessage: '' },
     extraReducers: (builder) => {
         builder
             .addCase(fetchEmployees.pending, (state) => {
@@ -106,6 +109,8 @@ const employeeSlice = createSlice({
             })
             .addCase(fetchEmployees.fulfilled, (state, action) => {
                 state.loading = false;
+                state.error = '';
+                state.successMessage = 'Fetched All Employees successfully';
                 state.employees = action.payload;
             })
             .addCase(fetchEmployees.rejected, (state, action) => {
@@ -118,6 +123,8 @@ const employeeSlice = createSlice({
             })
             .addCase(fetchEmployeeById.fulfilled, (state, action) => {
                 state.loading = false;
+                state.error = '';
+                state.successMessage = 'Fetched Employee by id successfully';
                 state.employees = state.employees.map((employee) => {
                     if (employee.employeeID === action.payload.employeeID) {
                         return action.payload;
@@ -135,6 +142,8 @@ const employeeSlice = createSlice({
             })
             .addCase(addEmployee.fulfilled, (state, action) => {
                 state.loading = false;
+                state.error = '';
+                state.successMessage = 'Added New Employee successfully';
                 state.employees.push(action.payload);
             })
             .addCase(addEmployee.rejected, (state, action) => {
@@ -147,12 +156,17 @@ const employeeSlice = createSlice({
             })
             .addCase(updateEmployeePersonalInformation.fulfilled, (state, action) => {
                 state.loading = false;
-                state.employees = state.employees.map((employee) => {
-                    if (employee.employeeID === action.payload.employeeID) {
-                        return action.payload;
-                    }
-                    return employee;
-                });
+                state.error = '';
+                if (action.payload === true) {
+                    state.successMessage = 'Employee Personal Information updated successfully';
+                } else {
+                    state.employees = state.employees.map((employee) => {
+                        if (employee.employeeID === action.payload.employeeID) {
+                            return action.payload;
+                        }
+                        return employee;
+                    });
+                }
             })
             .addCase(updateEmployeePersonalInformation.rejected, (state, action) => {
                 state.loading = false;
@@ -164,12 +178,17 @@ const employeeSlice = createSlice({
             })
             .addCase(updateEmployeeContactInformation.fulfilled, (state, action) => {
                 state.loading = false;
-                state.employees = state.employees.map((employee) => {
-                    if (employee.employeeID === action.payload.employeeID) {
-                        return action.payload;
-                    }
-                    return employee;
-                });
+                state.error = '';
+                if (action.payload === true) {
+                    state.successMessage = 'Employee Contact Information updated successfully';
+                } else {
+                    state.employees = state.employees.map((employee) => {
+                        if (employee.employeeID === action.payload.employeeID) {
+                            return action.payload;
+                        }
+                        return employee;
+                    });
+                }
             })
             .addCase(updateEmployeeContactInformation.rejected, (state, action) => {
                 state.loading = false;
@@ -181,12 +200,17 @@ const employeeSlice = createSlice({
             })
             .addCase(updateEmployeeFinancialDetails.fulfilled, (state, action) => {
                 state.loading = false;
-                state.employees = state.employees.map((employee) => {
-                    if (employee.employeeID === action.payload.employeeID) {
-                        return action.payload;
-                    }
-                    return employee;
-                });
+                state.error = '';
+                if (action.payload === true) {
+                    state.successMessage = 'Employee Financial Details updated successfully';
+                } else {
+                    state.employees = state.employees.map((employee) => {
+                        if (employee.employeeID === action.payload.employeeID) {
+                            return action.payload;
+                        }
+                        return employee;
+                    });
+                }
             })
             .addCase(updateEmployeeFinancialDetails.rejected, (state, action) => {
                 state.loading = false;

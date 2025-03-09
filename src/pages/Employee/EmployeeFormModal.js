@@ -17,7 +17,7 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
     const [open, setOpen] = useState(false);
     let [formData, setFormData] = useState({
         aadhaarNumber: "",
-        accountNumber: "",
+        bankAccountNumber: "",
         addressLine1: "",
         addressLine2: "",
         alternativeContactNumber: "",
@@ -38,7 +38,7 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
         firstName: "",
         gender: "",
         highestDegreeEarned: "",
-        ifscCode: "",
+        bankIFSCCode: "",
         insuranceEndDate: "",
         insurancePolicyNumber: "",
         insuranceStartDate: "",
@@ -192,6 +192,7 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
     const handleCISave = async () => {
         try{
             const ciData = {
+                employeeID,
                 addressLine1: formData.addressLine1,
                 addressLine2: formData.addressLine2,
                 state: formData.state,
@@ -208,10 +209,11 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                 previousOrgName: formData.previousOrgName
             }
             if (employeeID) {
-                let data = await dispatch(updateEmployeeContactInformation(...ciData, employeeID));
+                await dispatch(updateEmployeeContactInformation(ciData));
+                setUpdateSuccess(true);
             }
         } catch(err){
-
+            console.error(err);
         } finally {
             handleClose();
         }
@@ -220,9 +222,10 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
     const handleFDSave = async () => {
         try{
             const fdData = {
+                employeeID,
                 bankName: formData.bankName,
-                accountNumber: formData.accountNumber,
-                ifscCode: formData.ifscCode,
+                bankAccountNumber: formData.bankAccountNumber,
+                bankIFSCCode: formData.bankIFSCCode,
                 uanNumber: formData.uanNumber,
                 insurancePolicyNumber: formData.insurancePolicyNumber,
                 insurerName: formData.insurerName,
@@ -230,11 +233,12 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                 insuranceEndDate: formData.insuranceEndDate
             }
             if (employeeID) {
-                let data = await dispatch(updateEmployeeFinancialDetails(...fdData, ...{employeeID}));
+                await dispatch(updateEmployeeFinancialDetails(fdData));
+                setUpdateSuccess(true);
             }
         }
         catch(err){
-            
+            console.error(err);
         } finally {
             handleClose();
         }
@@ -763,13 +767,13 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                                 variant="outlined"
                                                 slotProps={{ inputLabel: { shrink: true } }}
                                                 size="small"
-                                                name="accountNumber"
-                                                value={formData.accountNumber}
+                                                name="bankAccountNumber"
+                                                value={formData.bankAccountNumber}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("accountNumber") && touched.accountNumber}
-                                                helperText={getFieldError("accountNumber")}
+                                                error={!isFieldValid("bankAccountNumber") && touched.bankAccountNumber}
+                                                helperText={getFieldError("bankAccountNumber")}
                                                 maxLength={50}
                                             />
                                         </Grid>
@@ -779,13 +783,13 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                             label="IFSC code"
                                             variant="outlined"
                                             size="small"
-                                            name="ifscCode"
-                                            value={formData.ifscCode}
+                                            name="bankIFSCCode"
+                                            value={formData.bankIFSCCode}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             required
-                                            error={!isFieldValid("ifscCode") && touched.ifscCode}
-                                            helperText={getFieldError("ifscCode")}
+                                            error={!isFieldValid("bankIFSCCode") && touched.bankIFSCCode}
+                                            helperText={getFieldError("bankIFSCCode")}
                                             maxLength={50}
                                         />
                                         </Grid>
@@ -888,7 +892,7 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                                 size="small"
                                                 color="primary"
                                                 onClick={() => handleFDSave()}
-                                                disabled={!isPanelValid(["bankName", "accountNumber", "ifscCode", 
+                                                disabled={!isPanelValid(["bankName", "bankAccountNumber", "bankIFSCCode", 
                                                     "uanNumber", "insurancePolicyNumber", "insurerName", 
                                                     "insuranceStartDate", "insuranceEndDate", ])}
                                             >
