@@ -980,21 +980,6 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                             </Panel>
                             <Panel title="Uploads">
                                 <Grid container rowSpacing={0} columnSpacing={3} sx={{paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent"}}>
-                                    {/* <Grid container spacing={3} size={12}>
-                                        <Grid size={6}>
-                                            
-                                        </Grid>
-                                        <Grid size={6} sx={{ textAlign: 'right', mt: 1}}>
-                                            <Button
-                                                variant="contained"
-                                                size="small"
-                                                color="primary"
-                                                onClick={() => handleUploadSave()}
-                                            >
-                                                Save
-                                            </Button>
-                                        </Grid>
-                                    </Grid> */}
                                     <Typography variant="h7" sx={{ fontWeight: 900 }}>Upload Employee Documents</Typography>
                                     <Grid container rowSpacing={0} columnSpacing={3} size={12} sx={{mt: 2}}>
                                         <Grid size={5}>
@@ -1097,7 +1082,6 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                     </Grid>
                                 </Grid>
                             </Panel>
-                            <Panel title="Activation"></Panel>
                         </Tabs>
                     </Grid>
                 </Box>

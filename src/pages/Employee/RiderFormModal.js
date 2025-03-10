@@ -39,7 +39,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         state: "",
         city: "",
         zip: "",
-        Landmark: ""
+        landmark: ""
     });
 
     const dispatch = useDispatch();
@@ -551,7 +551,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 label="City"
                                                 variant="outlined"
                                                 size="small"
-                                                name="City"
+                                                name="city"
                                                 value={formData.city}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
@@ -582,13 +582,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 label="Landmark"
                                                 variant="outlined"
                                                 size="small"
-                                                name="Landmark"
-                                                value={formData.Landmark}
+                                                name="landmark"
+                                                value={formData.landmark}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("landMark") && touched.landMark}
-                                                helperText={getFieldError("landMark")}
+                                                error={!isFieldValid("landmark") && touched.landmark}
+                                                helperText={getFieldError("landmark")}
                                             />
                                         </Grid>
                                     </Grid>
@@ -618,7 +618,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 label="Last Company Name"
                                                 variant="outlined"
                                                 size="small"
-                                                name="  "
+                                                name="lastCompanyName"
                                                 value={formData.lastCompanyName}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
