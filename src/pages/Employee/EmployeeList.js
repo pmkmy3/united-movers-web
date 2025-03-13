@@ -11,6 +11,7 @@ import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 import EmployeeFormModal from './EmployeeFormModal';
+import ActivateEmployeeModal from './ActivateEmployeeModal';
 
 
 const CustomToolbar = () => {
@@ -29,6 +30,8 @@ const EmployeeList = () => {
     const [searchText, setSearchText] = useState('');
     const [filteredEmployees, setFilteredEmployees] = useState([]);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
+    const [activateModalOpen, setActivateModalOpen] = useState(false);
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
 
     useEffect(() => {
         dispatch(fetchEmployees());
@@ -57,8 +60,13 @@ const EmployeeList = () => {
     };
 
     const handleActivate = (row) => {
+        setSelectedEmployee(row);
+        setActivateModalOpen(true);
+    };
+
+    const handleActivateSubmit = (employee, comments, activationDate) => {
         // Add logic to handle activating the employee
-        console.log("Activate", row);
+        console.log("Activate", employee, comments, activationDate);
     };
 
     const reloadGrid = () => {
@@ -158,6 +166,14 @@ const EmployeeList = () => {
                     />
                 </Box>
             </Box>
+            {selectedEmployee && (
+                <ActivateEmployeeModal
+                    open={activateModalOpen}
+                    handleClose={() => setActivateModalOpen(false)}
+                    handleActivate={handleActivateSubmit}
+                    employee={selectedEmployee}
+                />
+            )}
         </Container>
     );
 }

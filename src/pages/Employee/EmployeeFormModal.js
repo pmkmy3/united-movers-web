@@ -54,7 +54,13 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
         previousOrgName: "",
         state: "",
         uanNumber: "",
-        zip: ""
+        zip: "",
+        activationDate: "",
+        deactivationDate: "",
+        activatedBy: "",
+        deactivatedBy: "",
+        activationComments: "",
+        deactivationComments: ""
     });
     const [touched, setTouched] = useState({});
 
@@ -288,6 +294,7 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
             <Modal
                 open={open}
                 onClose={handleClose}
+                slotProps={{ BackdropProps: { onClick: (e) => e.stopPropagation() } }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
