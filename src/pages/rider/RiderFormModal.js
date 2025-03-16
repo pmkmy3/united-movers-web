@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRiderById, addRider, updateRiderPersonalInformation, updateRiderContactInformation, updateRiderFinancialDetails, updateAdditionalChecksDetails, addRiderContactInformation } from '../../store/reducers/riderSlice';
+import { fetchRiderById } from '../../store/reducers/riderSlice';
 import {
     Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem,
     IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
@@ -11,7 +11,6 @@ import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-svg-icons';
-import { reference } from '@popperjs/core';
 
 
 const RiderFormModal = ({ riderID, reloadGrid }) => {
@@ -167,9 +166,9 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
             }
             if (riderID) {
                 let reqObj = { ...piData, riderID };
-                await dispatch(updateRiderPersonalInformation(reqObj));
+                // await dispatch(updateRiderPersonalInformation(reqObj));
             } else {
-                await dispatch(addRider(piData));
+                // await dispatch(addRider(piData));
             }
             setUpdateSuccess(true);
         } catch (err) {
@@ -179,108 +178,108 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         }
     };
     const handleASSave = async () => {
-        try {
-            const aData = {
-                hasBackgroundVerification: formData.hasBackgroundVerification,
-                agencyName: formData.agencyName,
-                hasPhysicalVerificationDone: formData.hasPhysicalVerificationDone
-            }
-            if (riderID) {
-                let data = await dispatch(updateAdditionalChecksDetails(...aData, riderID));
-            }
-        }
-        catch (err) {
+        // try {
+        //     const aData = {
+        //         hasBackgroundVerification: formData.hasBackgroundVerification,
+        //         agencyName: formData.agencyName,
+        //         hasPhysicalVerificationDone: formData.hasPhysicalVerificationDone
+        //     }
+        //     if (riderID) {
+        //         let data = await dispatch(updateAdditionalChecksDetails(...aData, riderID));
+        //     }
+        // }
+        // catch (err) {
 
-        } finally {
-            handleClose();
-        }
+        // } finally {
+        //     handleClose();
+        // }
     }
     const handleCISave = async () => {
-        try {
-            const contactData = {
-                alternativeContactNumber: formData.alternativeContactNumber,
-                alternativeEmail: formData.alternativeEmail,
-                emergencyContactName: formData.emergencyContactName,
-                emergencyContactRelation: formData.emergencyContactRelation,
-                emergencyContactID: formData.emergencyContactID,
-                emergencyContactPhone: formData.emergencyContactPhone,
-                addressLine1: formData.addressLine1,
-                addressLine2: formData.addressLine2,
-                state: formData.state,
-                city: formData.city,
-                zip: formData.zip,
-                landmark: formData.landmark,
-                highestDegreeEarned: formData.highestDegreeEarned,
-                lastCompanyName: formData.lastCompanyName,
-                loggedInUserID: -1
-            };
+        // try {
+        //     const contactData = {
+        //         alternativeContactNumber: formData.alternativeContactNumber,
+        //         alternativeEmail: formData.alternativeEmail,
+        //         emergencyContactName: formData.emergencyContactName,
+        //         emergencyContactRelation: formData.emergencyContactRelation,
+        //         emergencyContactID: formData.emergencyContactID,
+        //         emergencyContactPhone: formData.emergencyContactPhone,
+        //         addressLine1: formData.addressLine1,
+        //         addressLine2: formData.addressLine2,
+        //         state: formData.state,
+        //         city: formData.city,
+        //         zip: formData.zip,
+        //         landmark: formData.landmark,
+        //         highestDegreeEarned: formData.highestDegreeEarned,
+        //         lastCompanyName: formData.lastCompanyName,
+        //         loggedInUserID: -1
+        //     };
 
-            if (riderID) {
-                let reqObj = { ...contactData, riderID };
-                await dispatch(updateRiderContactInformation(reqObj));
-            } else {
-                await dispatch(addRiderContactInformation(contactData));
-            }
-            setUpdateSuccess(true);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            handleClose();
-        }
+        //     if (riderID) {
+        //         let reqObj = { ...contactData, riderID };
+        //         await dispatch(updateRiderContactInformation(reqObj));
+        //     } else {
+        //         await dispatch(addRiderContactInformation(contactData));
+        //     }
+        //     setUpdateSuccess(true);
+        // } catch (err) {
+        //     console.error(err);
+        // } finally {
+        //     handleClose();
+        // }
     };
 
     const handleFinancialSave = async () => {
-        try {
-            const financialData = {
-                bankName: formData.bankName,
-                bankAccountNumber: formData.bankAccountNumber,
-                ifscCode: formData.ifscCode,
-                uanNumber: formData.uanNumber,
-                policyNumber: formData.policyNumber,
-                companyName: formData.companyName,
-                startDate: formData.startDate,
-                endDate: formData.endDate
-            };
+        // try {
+        //     const financialData = {
+        //         bankName: formData.bankName,
+        //         bankAccountNumber: formData.bankAccountNumber,
+        //         ifscCode: formData.ifscCode,
+        //         uanNumber: formData.uanNumber,
+        //         policyNumber: formData.policyNumber,
+        //         companyName: formData.companyName,
+        //         startDate: formData.startDate,
+        //         endDate: formData.endDate
+        //     };
 
-            if (riderID) {
-                await dispatch(updateRiderFinancialDetails(financialData));
-                setUpdateSuccess(true);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            handleClose();
-        }
+        //     if (riderID) {
+        //         await dispatch(updateRiderFinancialDetails(financialData));
+        //         setUpdateSuccess(true);
+        //     }
+        // } catch (err) {
+        //     console.error(err);
+        // } finally {
+        //     handleClose();
+        // }
     };
     const handleAdditionalChecksSave = async () => {
-        try {
-            const additionalChecksData = {
-                familyMembers: formData.familyMembers.map(member => ({
-                    name: member.name,
-                    relation: member.relation,
-                    idType: member.idType,
-                    idNumber: member.idNumber,
-                    contactNumber: member.contactNumber
-                })),
-                backgroundVerification: {
-                    completed: formData.backgroundVerification.completed,
-                    agencyName: formData.backgroundVerification.agencyName || "N/A",
-                    physicalVerificationCompleted: formData.backgroundVerification.physicalVerificationCompleted,
-                    isAadhaarVerificationDone: formData.backgroundVerification.isAadhaarVerificationDone,
-                    isContactNumberVerified: formData.backgroundVerification.isContactNumberVerified
-                },
-                attachments: formData.attachments
-            };
+        // try {
+        //     const additionalChecksData = {
+        //         familyMembers: formData.familyMembers.map(member => ({
+        //             name: member.name,
+        //             relation: member.relation,
+        //             idType: member.idType,
+        //             idNumber: member.idNumber,
+        //             contactNumber: member.contactNumber
+        //         })),
+        //         backgroundVerification: {
+        //             completed: formData.backgroundVerification.completed,
+        //             agencyName: formData.backgroundVerification.agencyName || "N/A",
+        //             physicalVerificationCompleted: formData.backgroundVerification.physicalVerificationCompleted,
+        //             isAadhaarVerificationDone: formData.backgroundVerification.isAadhaarVerificationDone,
+        //             isContactNumberVerified: formData.backgroundVerification.isContactNumberVerified
+        //         },
+        //         attachments: formData.attachments
+        //     };
 
-            if (riderID) {
-                await dispatch(updateAdditionalChecksDetails(additionalChecksData));
-                setUpdateSuccess(true);
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            handleClose();
-        }
+        //     if (riderID) {
+        //         await dispatch(updateAdditionalChecksDetails(additionalChecksData));
+        //         setUpdateSuccess(true);
+        //     }
+        // } catch (err) {
+        //     console.error(err);
+        // } finally {
+        //     handleClose();
+        // }
     };
     const isFieldValid = (field) => {
         if (field === "emailId" || field === "alternativeEmail") {

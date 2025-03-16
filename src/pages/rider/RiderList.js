@@ -7,7 +7,7 @@ import {
     GridToolbarExport,
     GridToolbarFilterButton
 } from '@mui/x-data-grid';
-import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Button, Tooltip } from '@mui/material';
+import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Tooltip } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 import RiderFormModal from './RiderFormModal';
@@ -58,15 +58,12 @@ const RiderList = () => {
     };
 
     const columns = [
-        { field: 'fullName', headerName: 'Full Name', flex: 1 },
-        // { field: 'gender', headerName: 'Gender', flex: 0.5 },
-        // { field: 'dateOfBirth', headerName: 'DOB', flex: 0.6, sortable: true },
-        { field: 'emailId', headerName: 'Email', flex: 1 },
+        { field: 'riderID', headerName: 'ID', flex: 0.5, sortable: true },
+        { field: 'fullName', headerName: 'Full Name', flex: 1, sortable: true },
+        { field: 'emailID', headerName: 'Email', flex: 1 },
         { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6 },
         { field: 'aadharCardNumber', headerName: 'Aadhaar Number', flex: 0.6  },
-        // { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
         { field: 'vendorName', headerName: 'Vendor Name', flex: 1 },
-        { field: 'referenceName', headerName: 'Reference Name', flex: 1 },
         {
           field: 'actions',
           headerName: 'Actions',

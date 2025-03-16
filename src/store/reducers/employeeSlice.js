@@ -9,12 +9,6 @@ export const fetchEmployees = createAsyncThunk('employees/fetchEmployees', async
         throw new Error('Failed to fetch employees');
     }
     return response.json();
-    
-    // return new Promise((resolve) => {
-    //     setTimeout(() => {
-    //       resolve(employees);
-    //     }, 2000);
-    //   });
 });
 
 export const fetchEmployeeById = createAsyncThunk('employees/fetchEmployeeById', async (id) => {
