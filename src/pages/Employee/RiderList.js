@@ -59,12 +59,12 @@ const RiderList = () => {
 
     const columns = [
         { field: 'fullName', headerName: 'Full Name', flex: 1 },
-        { field: 'gender', headerName: 'Gender', flex: 0.5 },
-        { field: 'dateOfBirth', headerName: 'DOB', flex: 0.6, sortable: true },
+        // { field: 'gender', headerName: 'Gender', flex: 0.5 },
+        // { field: 'dateOfBirth', headerName: 'DOB', flex: 0.6, sortable: true },
         { field: 'emailId', headerName: 'Email', flex: 1 },
         { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6 },
         { field: 'aadharCardNumber', headerName: 'Aadhaar Number', flex: 0.6  },
-        { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
+        // { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
         { field: 'vendorName', headerName: 'Vendor Name', flex: 1 },
         { field: 'referenceName', headerName: 'Reference Name', flex: 1 },
         {

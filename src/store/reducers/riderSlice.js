@@ -49,7 +49,7 @@ export const addRider = createAsyncThunk('riders/addRider', async (rider) => {
     return response.json();
 });
 
-export const updateRiderPersonalInformation = createAsyncThunk('riders/updateEmployeePersonalInformation', async (RiderPI) => {
+export const updateRiderPersonalInformation = createAsyncThunk('riders/', async (RiderPI) => {
     let url = `${API_BASE_URL}Rider`;
     const response = await fetch(url, {
         method: 'POST',
@@ -67,7 +67,12 @@ export const updateRiderPersonalInformation = createAsyncThunk('riders/updateEmp
         return { message: await response.text() };
     }
 });
-
+export const updateRiderContactInformation = createAsyncThunk('riders/', async (RiderCI) => {});
+export const updateRiderFinancialDetails = createAsyncThunk('riders/', async (RiderBI) => {});
+export const updateAdditionalChecksDetails = createAsyncThunk('riders/', async (RiderBD) => {});
+export const addRiderContactInformation = createAsyncThunk('riders/', async (RiderCI) => {});
+export const addRiderFinancialDetails = createAsyncThunk('riders/', async (RiderBI) => {});
+export const addAdditionalChecksDetails = createAsyncThunk('riders/', async (RiderBD) => {});
 
 export const fetchRiderById = createAsyncThunk('riders/fetchRiderById', async (id) => {
   // const response = await fetch(`${API_BASE_URL}rider/${id}`);
