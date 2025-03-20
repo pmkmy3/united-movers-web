@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchRiders } from '../../store/reducers/riderSlice';
+import { fetchRiders, fetchVendors } from '../../store/reducers/riderSlice';
 import {
     DataGrid,
     GridToolbarContainer,
@@ -10,6 +10,7 @@ import {
 import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Tooltip } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import RiderFormModal from './RiderFormModal';
 
 const CustomToolbar = () => {
@@ -22,14 +23,15 @@ const CustomToolbar = () => {
 };
 
 const RiderList = () => {
-    const { riders, loading, error } = useSelector(state => state.riders);
+    const { riders, vendors, loading, error } = useSelector(state => state.riders);
     const dispatch = useDispatch();
     const [searchText, setSearchText] = useState('');
     const [filteredRiders, setFilteredRiders] = useState([]);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-
+    
     useEffect(() => {
         dispatch(fetchRiders());
+        dispatch(fetchVendors());
     }, [dispatch]);
 
     useEffect(() => {
@@ -53,12 +55,16 @@ const RiderList = () => {
         console.log("Activate", row);
     };
 
+    const handleDelete = (row) => {
+        // Add logic to handle deleting the rider
+        console.log("Delete", row);
+    }
+
     const reloadGrid = () => {
         dispatch(fetchRiders());
     };
 
     const columns = [
-        { field: 'riderID', headerName: 'ID', flex: 0.5, sortable: true },
         { field: 'fullName', headerName: 'Full Name', flex: 1, sortable: true },
         { field: 'emailID', headerName: 'Email', flex: 1 },
         { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6 },
@@ -72,17 +78,27 @@ const RiderList = () => {
           filterable: false,
           renderCell: (params) => (
             <div style={{ display: 'flex', justifyContent: 'space-around' }}>
-              <RiderFormModal riderID={params.row.riderID} reloadGrid={reloadGrid} />
-              <IconButton
-                color="secondary"
-                size="small"
-                onClick={() => handleActivate(params.row)}
-                sx={{ width: "50px", Height: "50px" }}
-              >
-                <Tooltip title="Activate Rider" arrow>
-                  <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='blue' />
-                </Tooltip>
-              </IconButton>
+                <RiderFormModal riderID={params.row.riderID} vendors={vendors} reloadGrid={reloadGrid} />
+                <IconButton
+                    color="secondary"
+                    size="small"
+                    onClick={() => handleActivate(params.row)}
+                    sx={{ width: "50px", Height: "50px" }}
+                >
+                    <Tooltip title="Activate Rider" arrow>
+                        <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='#1976d2' />
+                    </Tooltip>
+                </IconButton>
+                <IconButton
+                    color="secondary"
+                    size="small"
+                    onClick={() => handleDelete(params.row)}
+                    sx={{ width: "50px", Height: "50px" }}
+                >
+                    <Tooltip title="Delete Rider" arrow>
+                        <FontAwesomeIcon icon={faTrashCan} color='#1976d2' />
+                    </Tooltip>
+                </IconButton>
             </div>
           ),
         },
@@ -111,7 +127,7 @@ const RiderList = () => {
                         />
                     </Grid>
                     <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
-                        <RiderFormModal reloadGrid={reloadGrid} />
+                        <RiderFormModal reloadGrid={reloadGrid} vendors={vendors} />
                     </Grid>
                 </Grid>
                 <Box sx={{ minHeight: "100%", width: '100%' }}>

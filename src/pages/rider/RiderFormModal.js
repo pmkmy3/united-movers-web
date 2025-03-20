@@ -13,10 +13,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-svg-icons';
 
 
-const RiderFormModal = ({ riderID, reloadGrid }) => {
+const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
+    
     const [open, setOpen] = useState(false);
     let [formData, setFormData] = useState({
-        vendorName: "",
+        vendorID: "",
         referenceName: "",
         fullName: "",
         gender: "",
@@ -25,38 +26,42 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         panNumber: "",
         bloodGroup: "",
         contactNumber: "",
-        emailId: "",
-        lastCompanyName: "",
-        highestDegreeEarned: "",
-        emergencyContactPhone: "",
-        emergencyContactID: "",
+        emailID: "",
+        alternativeContactNumber: "",
+        alternativeEmail: "",
+        emergencyContactNumber: "",
+        emergencyContactPersonID: "",
         emergencyContactRelation: "",
         emergencyContactName: "",
-        alternativeEmail: "",
-        alternativeContactNumber: "",
         addressLine1: "",
         addressLine2: "",
         state: "",
         city: "",
         zip: "",
         landmark: "",
+        highestDegreeEarned: "",
+        previousOrgName: "",
+        accountNumber: "",
         bankName: "",
-        bankAccountNumber: "",
         ifscCode: "",
         uanNumber: "",
-        policyNumber: "",
-        companyName: "",
-        startDate: "",
-        endDate: "",
-        familyMembers: [],
-        backgroundVerification: {
-            completed: "",
-            agencyName: "",
-            physicalVerificationCompleted: "",
-            isAadhaarVerificationDone: "",
-            isContactNumberVerified: ""
-        },
-        attachments: []
+        insurancePolicyNumber: "",
+        insurerName: "",
+        insuranceStartDate: "",
+        insuranceEndDate: "",
+        familyMemberName: "",
+        familyMemberRelation: "",
+        familyMemberIDType: "",
+        familyMemberID: "",
+        familyMemberContact: "",
+        isBackgroundVerificationCompleted: false,
+        isPhysicalVerificationCompleted: false,
+        backgroundVerificationAgencyName: "",
+        isAadhaarVerified: false,
+        isContactNumberVerified: false,
+        additionalNotes: "",
+        createdByID: 0,
+        createdDate: ""
     });
 
     const dispatch = useDispatch();
@@ -153,7 +158,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         try {
             const piData = {
                 fullName: formData.fullName,
-                vendorName: formData.vendorName,
+                vendorID: formData.vendorID,
                 referenceName: formData.referenceName,
                 gender: formData.gender,
                 dateOfBirth: formData.dateOfBirth,
@@ -161,7 +166,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                 pan: formData.panNumber,
                 contactNumber: formData.contactNumber,
                 bloodGroup: formData.bloodGroup,
-                emailId: formData.emailId,
+                emailID: formData.emailID,
                 loggedInUserID: -1
             }
             if (riderID) {
@@ -201,8 +206,8 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         //         alternativeEmail: formData.alternativeEmail,
         //         emergencyContactName: formData.emergencyContactName,
         //         emergencyContactRelation: formData.emergencyContactRelation,
-        //         emergencyContactID: formData.emergencyContactID,
-        //         emergencyContactPhone: formData.emergencyContactPhone,
+        //         emergencyContactPersonID: formData.emergencyContactPersonID,
+        //         emergencyContactNumber: formData.emergencyContactNumber,
         //         addressLine1: formData.addressLine1,
         //         addressLine2: formData.addressLine2,
         //         state: formData.state,
@@ -210,7 +215,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         //         zip: formData.zip,
         //         landmark: formData.landmark,
         //         highestDegreeEarned: formData.highestDegreeEarned,
-        //         lastCompanyName: formData.lastCompanyName,
+        //         previousOrgName: formData.previousOrgName,
         //         loggedInUserID: -1
         //     };
 
@@ -232,13 +237,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         // try {
         //     const financialData = {
         //         bankName: formData.bankName,
-        //         bankAccountNumber: formData.bankAccountNumber,
+        //         accountNumber: formData.accountNumber,
         //         ifscCode: formData.ifscCode,
         //         uanNumber: formData.uanNumber,
-        //         policyNumber: formData.policyNumber,
-        //         companyName: formData.companyName,
-        //         startDate: formData.startDate,
-        //         endDate: formData.endDate
+        //         insurancePolicyNumber: formData.insurancePolicyNumber,
+        //         insurerName: formData.insurerName,
+        //         insuranceStartDate: formData.insuranceStartDate,
+        //         insuranceEndDate: formData.insuranceEndDate
         //     };
 
         //     if (riderID) {
@@ -256,9 +261,9 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         //     const additionalChecksData = {
         //         familyMembers: formData.familyMembers.map(member => ({
         //             name: member.name,
-        //             relation: member.relation,
-        //             idType: member.idType,
-        //             idNumber: member.idNumber,
+        //             familyMemberRelation: member.familyMemberRelation,
+        //             familyMemberIDType: member.familyMemberIDType,
+        //             familyMemberID: member.familyMemberID,
         //             contactNumber: member.contactNumber
         //         })),
         //         backgroundVerification: {
@@ -282,7 +287,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
         // }
     };
     const isFieldValid = (field) => {
-        if (field === "emailId" || field === "alternativeEmail") {
+        if (field === "emailID" || field === "alternativeEmail") {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             return emailRegex.test(formData[field]);
         }
@@ -290,7 +295,10 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
             const contactNumberRegex = /^\d{10}$/;
             return contactNumberRegex.test(formData[field]);
         }
-        return typeof formData[field] === "string" && formData[field].trim() !== "";
+        else if(typeof formData[field] === "string") {
+            return formData[field].trim() !== "";
+        }
+        return formData[field] !== "";
     };
 
 
@@ -347,19 +355,26 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                         />
                                     </Grid>
                                     <Grid size={5} sx={{ marginTop: 1 }} >
-                                        <TextField
+                                    <TextField
                                             fullWidth
                                             label="Vendor Name"
                                             variant="outlined"
                                             size="small"
-                                            name="vendorName"
-                                            value={formData.vendorName}
+                                            name="vendorID"
+                                            value={formData.vendorID}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             required
-                                            error={!isFieldValid("vendorName") && touched.vendorName}
-                                            helperText={getFieldError("vendorName")}
-                                        />
+                                            error={!isFieldValid("vendorID") && touched.vendorID}
+                                            helperText={getFieldError("vendorID")}
+                                            select
+                                        >
+                                            {vendors && vendors.map((vendor) => (
+                                                <MenuItem key={vendor.id} value={vendor.id}>
+                                                    {vendor.name}
+                                                </MenuItem>
+                                            ))}
+                                        </TextField>
                                     </Grid>
                                     <Grid size={5} sx={{ marginTop: 0.4 }} >
                                         <TextField
@@ -492,13 +507,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                             label="Email ID"
                                             variant="outlined"
                                             size="small"
-                                            name="emailId"
-                                            value={formData.emailId}
+                                            name="emailID"
+                                            value={formData.emailID}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
                                             required
-                                            error={!isFieldValid("emailId") && touched.emailId}
-                                            helperText={getFieldError("emailId")}
+                                            error={!isFieldValid("emailID") && touched.emailID}
+                                            helperText={getFieldError("emailID")}
                                         />
                                     </Grid>
                                     <Grid size={10} sx={{ mt: 2, mb: 2 }}>
@@ -508,7 +523,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 size="small"
                                                 color="primary"
                                                 onClick={() => handlePISave("PI")}
-                                                disabled={!isPanelValid(["fullName", "vendorName", "referenceName", "gender", "dateOfBirth", "aadharCardNumber", "panNumber", "contactNumber", "bloodGroup", "emailId"])}
+                                                disabled={!isPanelValid(["fullName", "vendorID", "referenceName", "gender", "dateOfBirth", "aadharCardNumber", "panNumber", "contactNumber", "bloodGroup", "emailID"])}
                                             >
                                                 Save
                                             </Button>
@@ -594,13 +609,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 label="Emergency Contact ID"
                                                 variant="outlined"
                                                 size="small"
-                                                name="emergencyContactID"
-                                                value={formData.emergencyContactID}
+                                                name="emergencyContactPersonID"
+                                                value={formData.emergencyContactPersonID}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("emergencyContactID") && touched.emergencyContactID}
-                                                helperText={getFieldError("emergencyContactID")}
+                                                error={!isFieldValid("emergencyContactPersonID") && touched.emergencyContactPersonID}
+                                                helperText={getFieldError("emergencyContactPersonID")}
                                             />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1, mb: 1 }} >
@@ -610,13 +625,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 variant="outlined"
                                                 size="small"
                                                 type="number"
-                                                name="emergencyContactPhone"
-                                                value={formData.emergencyContactPhone}
+                                                name="emergencyContactNumber"
+                                                value={formData.emergencyContactNumber}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("emergencyContactPhone") && touched.emergencyContactPhone}
-                                                helperText={getFieldError("emergencyContactPhone")}
+                                                error={!isFieldValid("emergencyContactNumber") && touched.emergencyContactNumber}
+                                                helperText={getFieldError("emergencyContactNumber")}
                                             />
                                         </Grid>
                                     </Grid>
@@ -742,13 +757,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 label="Last Company Name"
                                                 variant="outlined"
                                                 size="small"
-                                                name="lastCompanyName"
-                                                value={formData.lastCompanyName}
+                                                name="previousOrgName"
+                                                value={formData.previousOrgName}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("lastCompanyName") && touched.lastCompanyName}
-                                                helperText={getFieldError("lastCompanyName")}
+                                                error={!isFieldValid("previousOrgName") && touched.previousOrgName}
+                                                helperText={getFieldError("previousOrgName")}
                                             />
                                         </Grid>
                                         <Grid size={10} sx={{ mt: 2, mb: 2 }}>
@@ -758,7 +773,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                     size="small"
                                                     color="primary"
                                                     onClick={() => handleCISave("CI")}
-                                                    disabled={!isPanelValid(["alternativeContactNumber", "alternativeEmail", "emergencyContactName", "emergencyContactRelation", "emergencyContactID", "emergencyContactPhone", "addressLine1", "addressLine2", "state", "city", "zip", "landmark", "highestDegreeEarned", "lastCompanyName"])}
+                                                    disabled={!isPanelValid(["alternativeContactNumber", "alternativeEmail", "emergencyContactName", "emergencyContactRelation", "emergencyContactPersonID", "emergencyContactNumber", "addressLine1", "addressLine2", "state", "city", "zip", "landmark", "highestDegreeEarned", "previousOrgName"])}
                                                 >
                                                     Save
                                                 </Button>
@@ -796,13 +811,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 variant="outlined"
                                                 size="small"
                                                 type="number"
-                                                name="bankAccountNumber"
-                                                value={formData.bankAccountNumber}
+                                                name="accountNumber"
+                                                value={formData.accountNumber}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("bankAccountNumber") && touched.bankAccountNumber}
-                                                helperText={getFieldError("bankAccountNumber")}
+                                                error={!isFieldValid("accountNumber") && touched.accountNumber}
+                                                helperText={getFieldError("accountNumber")}
                                             />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1 }}>
@@ -856,28 +871,28 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 label="Policy Number"
                                                 variant="outlined"
                                                 size="small"
-                                                name="policyNumber"
-                                                value={formData.policyNumber}
+                                                name="insurancePolicyNumber"
+                                                value={formData.insurancePolicyNumber}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("policyNumber") && touched.policyNumber}
-                                                helperText={getFieldError("policyNumber")}
+                                                error={!isFieldValid("insurancePolicyNumber") && touched.insurancePolicyNumber}
+                                                helperText={getFieldError("insurancePolicyNumber")}
                                             />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1 }}>
                                             <TextField
                                                 fullWidth
-                                                label="Company Name"
+                                                label="Insurer Name"
                                                 variant="outlined"
                                                 size="small"
-                                                name="companyName"
-                                                value={formData.companyName}
+                                                name="insurerName"
+                                                value={formData.insurerName}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("companyName") && touched.companyName}
-                                                helperText={getFieldError("companyName")}
+                                                error={!isFieldValid("insurerName") && touched.insurerName}
+                                                helperText={getFieldError("insurerName")}
                                             />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 2 }}>
@@ -888,13 +903,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 size="small"
                                                 type="date"
                                                 slotProps={{ inputLabel: { shrink: true } }}
-                                                name="startDate"
-                                                value={formData.startDate}
+                                                name="insuranceStartDate"
+                                                value={formData.insuranceStartDate}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("startDate") && touched.startDate}
-                                                helperText={getFieldError("startDate")}
+                                                error={!isFieldValid("insuranceStartDate") && touched.insuranceStartDate}
+                                                helperText={getFieldError("insuranceStartDate")}
                                             />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 2 }}>
@@ -905,13 +920,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 size="small"
                                                 type="date"
                                                 slotProps={{ inputLabel: { shrink: true } }}
-                                                name="endDate"
-                                                value={formData.endDate}
+                                                name="insuranceEndDate"
+                                                value={formData.insuranceEndDate}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("endDate") && touched.endDate}
-                                                helperText={getFieldError("endDate")}
+                                                error={!isFieldValid("insuranceEndDate") && touched.insuranceEndDate}
+                                                helperText={getFieldError("insuranceEndDate")}
                                             />
                                         </Grid>
                                     </Grid>
@@ -922,7 +937,7 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                                 size="small"
                                                 color="primary"
                                                 onClick={() => handleFinancialSave("FinancialDetails")}
-                                                disabled={!isPanelValid(["bankName", "bankAccountNumber", "ifscCode", "uanNumber", "policyNumber", "companyName", "startDate", "endDate"])}
+                                                disabled={!isPanelValid(["bankName", "accountNumber", "ifscCode", "uanNumber", "insurancePolicyNumber", "insurerName", "insuranceStartDate", "insuranceEndDate"])}
                                             >
                                                 Save
                                             </Button>
@@ -941,13 +956,13 @@ const RiderFormModal = ({ riderID, reloadGrid }) => {
                                             <TextField fullWidth label="Name" variant="outlined" size="small" name="familyMemberName" error={!isFieldValid("familyMemberName") && touched.familyMemberName} helperText={getFieldError("familyMemberName")} value={formData.familyMemberName} onChange={handleChange} onBlur={handleBlur} required />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1 }}>
-                                            <TextField fullWidth label="Relation" variant="outlined" size="small" name="relation" error={!isFieldValid("relation") && touched.relation} value={formData.relation} helperText={getFieldError("relation")} onChange={handleChange} onBlur={handleBlur} required />
+                                            <TextField fullWidth label="Relation" variant="outlined" size="small" name="familyMemberRelation" error={!isFieldValid("familyMemberRelation") && touched.familyMemberRelation} value={formData.familyMemberRelation} helperText={getFieldError("familyMemberRelation")} onChange={handleChange} onBlur={handleBlur} required />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1 }}>
-                                            <TextField fullWidth label="ID Type" variant="outlined" size="small" name="idType" error={!isFieldValid("idType") && touched.idType} value={formData.idType} helperText={getFieldError("idType")} onChange={handleChange} onBlur={handleBlur} required />
+                                            <TextField fullWidth label="ID Type" variant="outlined" size="small" name="familyMemberIDType" error={!isFieldValid("familyMemberIDType") && touched.familyMemberIDType} value={formData.familyMemberIDType} helperText={getFieldError("familyMemberIDType")} onChange={handleChange} onBlur={handleBlur} required />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1 }}>
-                                            <TextField fullWidth label="ID Number" variant="outlined" size="small" name="idNumber" error={!isFieldValid("idNumber") && touched.idNumber} value={formData.idNumber} helperText={getFieldError("idNumber")} onChange={handleChange} onBlur={handleBlur} required />
+                                            <TextField fullWidth label="ID Number" variant="outlined" size="small" name="familyMemberID" error={!isFieldValid("familyMemberID") && touched.familyMemberID} value={formData.familyMemberID} helperText={getFieldError("familyMemberID")} onChange={handleChange} onBlur={handleBlur} required />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1 }}>
                                             <TextField fullWidth label="Contact Number" variant="outlined" size="small" name="contactNumber" error={!isFieldValid("contactNumber") && touched.contactNumber} helperText={getFieldError("contactNumber")} value={formData.contactNumber} onChange={handleChange} onBlur={handleBlur} required />

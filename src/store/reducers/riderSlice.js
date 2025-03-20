@@ -19,9 +19,17 @@ export const fetchRiderById = createAsyncThunk('riders/fetchRiderById', async (i
   return response.json();
 });
 
+export const fetchVendors = createAsyncThunk('vendors/fetchVendors', async () => {
+  const response = await fetch(`${API_BASE_URL}Rider/Vendor`);
+  if (!response.ok) {
+      throw new Error('Failed to fetch vendors');
+  }
+  return response.json();
+});
+
 const riderSlice = createSlice({ 
   name: 'riders', 
-  initialState: { riders: [], loading: false, error: null },
+  initialState: { riders: [], vendors: [], loading: false, error: null },
   extraReducers: (builder) => {
     builder
       .addCase(fetchRiders.pending, (state) => {
@@ -33,6 +41,18 @@ const riderSlice = createSlice({
           state.riders = action.payload;
       })
       .addCase(fetchRiders.rejected, (state, action) => {
+          state.loading = false;
+          state.error = action.error.message;
+      })
+      .addCase(fetchVendors.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchVendors.fulfilled, (state, action) => {
+          state.loading = false;
+          state.vendors = action.payload;
+      })
+      .addCase(fetchVendors.rejected, (state, action) => {
           state.loading = false;
           state.error = action.error.message;
       })

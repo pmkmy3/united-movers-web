@@ -78,11 +78,10 @@ const EmployeeList = () => {
     const columns = [
         { field: 'firstName', headerName: 'First Name', flex: 1 },
         { field: 'lastName', headerName: 'Last Name', flex: 1  },
-        { field: 'gender', headerName: 'Gender', flex: 0.5  },
-        { field: 'dateOfBirth', headerName: 'DOB', flex: 0.6, sortable: true },
         { field: 'personalEmailID', headerName: 'Email', flex: 1  },
-        { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6  },
-        { field: 'bloodGroup', headerName: 'Blood Group', flex: 0.5 },
+        { field: 'contactNumber', headerName: 'Contact Number', flex: 0.7  },
+        { field: 'aadhaarNumber', headerName: 'Aadhaar Number', flex: 0.7  },
+        { field: 'panNumber', headerName: 'PAN Number', flex: 0.6  },
         {
             field: 'actions',
             headerName: 'Actions',
