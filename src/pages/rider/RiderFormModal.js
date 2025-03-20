@@ -313,9 +313,8 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                         <IconButton
                             color="primary"
                             size="small"
-                            style={{ marginRight: 8 }}
                             onClick={handleOpen}
-                            sx={{ width: "50px", Height: "50px" }}
+                            sx={{ width: "40px", Height: "40px" }}
                         >
                             <Tooltip title="Edit Rider" arrow><FontAwesomeIcon icon={faEdit} /></Tooltip>
                         </IconButton>

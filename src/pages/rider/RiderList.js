@@ -69,34 +69,34 @@ const RiderList = () => {
         { field: 'emailID', headerName: 'Email', flex: 1 },
         { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6 },
         { field: 'aadharCardNumber', headerName: 'Aadhaar Number', flex: 0.6  },
-        { field: 'vendorName', headerName: 'Vendor Name', flex: 1 },
+        { field: 'vendorName', headerName: 'Vendor Name', flex: 0.6 },
         {
           field: 'actions',
           headerName: 'Actions',
-          flex: 0.6,
+          flex: 0.8,
           sortable: false,
           filterable: false,
           renderCell: (params) => (
-            <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+            <div style={{ display: 'flex' }}>
                 <RiderFormModal riderID={params.row.riderID} vendors={vendors} reloadGrid={reloadGrid} />
                 <IconButton
                     color="secondary"
                     size="small"
-                    onClick={() => handleActivate(params.row)}
-                    sx={{ width: "50px", Height: "50px" }}
+                    onClick={() => handleDelete(params.row)}
+                    sx={{ width: "40px", Height: "40px" }}
                 >
-                    <Tooltip title="Activate Rider" arrow>
-                        <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='#1976d2' />
+                    <Tooltip title="Delete Rider" arrow>
+                        <FontAwesomeIcon icon={faTrashCan} color='#1976d2' />
                     </Tooltip>
                 </IconButton>
                 <IconButton
                     color="secondary"
                     size="small"
-                    onClick={() => handleDelete(params.row)}
-                    sx={{ width: "50px", Height: "50px" }}
+                    onClick={() => handleActivate(params.row)}
+                    sx={{ width: "40px", Height: "40px" }}
                 >
-                    <Tooltip title="Delete Rider" arrow>
-                        <FontAwesomeIcon icon={faTrashCan} color='#1976d2' />
+                    <Tooltip title="Activate Rider" arrow>
+                        <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='#1976d2' />
                     </Tooltip>
                 </IconButton>
             </div>

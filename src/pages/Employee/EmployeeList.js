@@ -9,7 +9,8 @@ import {
 } from '@mui/x-data-grid';
 import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Button, Tooltip } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
+import { faCheckSquare, faSquare, faCircleUser } from '@fortawesome/free-regular-svg-icons';
+import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import EmployeeFormModal from './EmployeeFormModal';
 import ActivateEmployeeModal from './ActivateEmployeeModal';
 
@@ -64,6 +65,16 @@ const EmployeeList = () => {
         setActivateModalOpen(true);
     };
 
+    const handleDelete = (row) => {
+        // Add logic to handle deleting the employee
+        console.log("Delete", row);
+    };
+
+    const handleAssignUserRole = (employee) => {
+        // Add logic to handle assigning roles to the employee
+        console.log("Assign Roles", employee);
+    };
+
     const handleActivateSubmit = (employee, comments, activationDate) => {
         // Add logic to handle activating the employee
         console.log("Activate", employee, comments, activationDate);
@@ -85,19 +96,39 @@ const EmployeeList = () => {
         {
             field: 'actions',
             headerName: 'Actions',
-            flex: 0.6,
+            flex: 1,
             sortable: false, filterable: false,
             renderCell: (params) => (
-                <div style={{ display: 'flex', justifyContent: 'space-around' }}>
+                <div style={{ display: 'flex' }}>
                     <EmployeeFormModal employeeID={params.row.employeeID} reloadGrid={reloadGrid} />
                     <IconButton
                         color="secondary"
                         size="small"
+                        onClick={() => handleDelete(params.row)}
+                        sx={{ width: "40px", Height: "40px" }}
+                    >
+                        <Tooltip title="Delete Rider" arrow>
+                            <FontAwesomeIcon icon={faTrashCan} color='#1976d2' />
+                        </Tooltip>
+                    </IconButton>
+                    <IconButton
+                        color="secondary"
+                        size="small"
                         onClick={() => handleActivate(params.row)}
-                        sx={{ width: "50px", Height: "50px" }}
+                        sx={{ width: "40px", Height: "40px" }}
                     >
                         <Tooltip title="Activate Employee" arrow>
-                            <FontAwesomeIcon icon={(true)? faSquare : faCheckSquare } color='blue' />
+                            <FontAwesomeIcon icon={(true)? faSquare : faCheckSquare } color='#1976d2' />
+                        </Tooltip>
+                    </IconButton>
+                    <IconButton
+                        color="secondary"
+                        size="small"
+                        onClick={() => handleAssignUserRole(params.row)}
+                        sx={{ width: "40px", Height: "40px" }}
+                    >
+                        <Tooltip title="Modify Roles" arrow>
+                            <FontAwesomeIcon icon={faCircleUser} color='#1976d2' />
                         </Tooltip>
                     </IconButton>
                 </div>
