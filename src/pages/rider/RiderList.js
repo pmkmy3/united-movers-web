@@ -12,13 +12,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import RiderFormModal from './RiderFormModal';
+import ActivateRiderModal from './ActivateRiderModal';
+import { deleteRider } from '../../store/reducers/riderSlice';
 
 const CustomToolbar = () => {
     return (
-      <GridToolbarContainer>
-        <GridToolbarFilterButton />
-        <GridToolbarExport />
-      </GridToolbarContainer>
+        <GridToolbarContainer>
+            <GridToolbarFilterButton />
+            <GridToolbarExport />
+        </GridToolbarContainer>
     );
 };
 
@@ -28,7 +30,9 @@ const RiderList = () => {
     const [searchText, setSearchText] = useState('');
     const [filteredRiders, setFilteredRiders] = useState([]);
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
-    
+    const [activateModalOpen, setActivateModalOpen] = useState(false);
+    const [selectedRider, setselectedRider] = useState(null);
+
     useEffect(() => {
         dispatch(fetchRiders());
         dispatch(fetchVendors());
@@ -52,13 +56,25 @@ const RiderList = () => {
 
     const handleActivate = (row) => {
         // Add logic to handle activating the rider
+        setselectedRider(row);
+        setActivateModalOpen(true);
         console.log("Activate", row);
     };
 
+    // const handleDelete = (row) => {
+    //     // Add logic to handle deleting the rider
+    //     console.log("Delete", row);
+    // }
     const handleDelete = (row) => {
-        // Add logic to handle deleting the rider
-        console.log("Delete", row);
-    }
+    
+        dispatch(deleteRider(row.id))
+            .then(() => console.log("Deleted:", row))
+            .catch((error) => console.error("Error deleting rider:", error));
+    };
+    const handleActivateSubmit = (rider, comments, activationDate) => {
+        // Add logic to handle activating the rider
+        console.log("Activate", rider, comments, activationDate);
+    };
 
     const reloadGrid = () => {
         dispatch(fetchRiders());
@@ -68,45 +84,45 @@ const RiderList = () => {
         { field: 'fullName', headerName: 'Full Name', flex: 1, sortable: true },
         { field: 'emailID', headerName: 'Email', flex: 1 },
         { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6 },
-        { field: 'aadharCardNumber', headerName: 'Aadhaar Number', flex: 0.6  },
+        { field: 'aadharCardNumber', headerName: 'Aadhaar Number', flex: 0.6 },
         { field: 'vendorName', headerName: 'Vendor Name', flex: 0.6 },
         {
-          field: 'actions',
-          headerName: 'Actions',
-          flex: 0.8,
-          sortable: false,
-          filterable: false,
-          renderCell: (params) => (
-            <div style={{ display: 'flex' }}>
-                <RiderFormModal riderID={params.row.riderID} vendors={vendors} reloadGrid={reloadGrid} />
-                <IconButton
-                    color="secondary"
-                    size="small"
-                    onClick={() => handleDelete(params.row)}
-                    sx={{ width: "40px", Height: "40px" }}
-                >
-                    <Tooltip title="Delete Rider" arrow>
-                        <FontAwesomeIcon icon={faTrashCan} color='#1976d2' />
-                    </Tooltip>
-                </IconButton>
-                <IconButton
-                    color="secondary"
-                    size="small"
-                    onClick={() => handleActivate(params.row)}
-                    sx={{ width: "40px", Height: "40px" }}
-                >
-                    <Tooltip title="Activate Rider" arrow>
-                        <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='#1976d2' />
-                    </Tooltip>
-                </IconButton>
-            </div>
-          ),
+            field: 'actions',
+            headerName: 'Actions',
+            flex: 0.8,
+            sortable: false,
+            filterable: false,
+            renderCell: (params) => (
+                <div style={{ display: 'flex' }}>
+                    <RiderFormModal riderID={params.row.riderID} vendors={vendors} reloadGrid={reloadGrid} />
+                    <IconButton
+                        color="secondary"
+                        size="small"
+                        onClick={() => handleDelete(params.row)}
+                        sx={{ width: "40px", Height: "40px" }}
+                    >
+                        <Tooltip title="Delete Rider" arrow>
+                            <FontAwesomeIcon icon={faTrashCan} color='#1976d2' />
+                        </Tooltip>
+                    </IconButton>
+                    <IconButton
+                        color="secondary"
+                        size="small"
+                        onClick={() => handleActivate(params.row)}
+                        sx={{ width: "40px", Height: "40px" }}
+                    >
+                        <Tooltip title="Activate Rider" arrow>
+                            <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='#1976d2' />
+                        </Tooltip>
+                    </IconButton>
+                </div>
+            ),
         },
     ];
 
 
     return (
-        <Container component="main" maxWidth={false} sx={{ maxwidth: '100%'  }}>
+        <Container component="main" maxWidth={false} sx={{ maxwidth: '100%' }}>
             <CssBaseline />
             <Box sx={{ mt: 0 }}>
                 <Typography component="h3" variant="h5">
@@ -147,10 +163,10 @@ const RiderList = () => {
                         }}
                         sx={{
                             "& .MuiDataGrid-footerContainer": {
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              flexWrap: "nowrap"
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                flexWrap: "nowrap"
                             },
                             "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
                                 margin: "0 8px"
@@ -164,6 +180,14 @@ const RiderList = () => {
                     />
                 </Box>
             </Box>
+            {selectedRider && (
+                <ActivateRiderModal
+                    open={activateModalOpen}
+                    handleClose={() => setActivateModalOpen(false)}
+                    handleActivate={handleActivateSubmit}
+                    rider={selectedRider}
+                />
+            )}
         </Container>
     )
 

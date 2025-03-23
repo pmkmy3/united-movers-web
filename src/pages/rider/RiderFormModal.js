@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRiderById } from '../../store/reducers/riderSlice';
+import { fetchRiderById, addRider, updateRiderPI, updateRiderCI, updateRiderFD, updateRiderAC } from '../../store/reducers/riderSlice';
 import {
     Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem,
     IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
@@ -14,7 +14,7 @@ import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-s
 
 
 const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
-    
+
     const [open, setOpen] = useState(false);
     let [formData, setFormData] = useState({
         vendorID: "",
@@ -154,6 +154,20 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
     const isPanelValid = (fields) => {
         return fields.every((field) => isFieldValid(field));
     };
+    const isFieldValid = (field) => {
+        if (field === "emailID" || field === "alternativeEmail") {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test(formData[field]);
+        }
+        else if (field === "alternativeContactNumber" || field === "emergencyContactNumber") {
+            const contactNumberRegex = /^\d{10}$/;
+            return contactNumberRegex.test(formData[field]);
+        }
+        else if (typeof formData[field] === "string") {
+            return formData[field].trim() !== "";
+        }
+        return formData[field] !== "";
+    };
     const handlePISave = async () => {
         try {
             const piData = {
@@ -162,18 +176,19 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                 referenceName: formData.referenceName,
                 gender: formData.gender,
                 dateOfBirth: formData.dateOfBirth,
-                aadharCardNumber: formData.aadharCardNumber,
+                aadhaarNumber: formData.aadharCardNumber,
                 pan: formData.panNumber,
                 contactNumber: formData.contactNumber,
                 bloodGroup: formData.bloodGroup,
-                emailID: formData.emailID,
+                personalEmailID: formData.emailID,
                 loggedInUserID: -1
             }
             if (riderID) {
                 let reqObj = { ...piData, riderID };
-                // await dispatch(updateRiderPersonalInformation(reqObj));
+                await dispatch(updateRiderPI(reqObj));
             } else {
-                // await dispatch(addRider(piData));
+
+                await dispatch(addRider(piData));
             }
             setUpdateSuccess(true);
         } catch (err) {
@@ -200,109 +215,94 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
         // }
     }
     const handleCISave = async () => {
-        // try {
-        //     const contactData = {
-        //         alternativeContactNumber: formData.alternativeContactNumber,
-        //         alternativeEmail: formData.alternativeEmail,
-        //         emergencyContactName: formData.emergencyContactName,
-        //         emergencyContactRelation: formData.emergencyContactRelation,
-        //         emergencyContactPersonID: formData.emergencyContactPersonID,
-        //         emergencyContactNumber: formData.emergencyContactNumber,
-        //         addressLine1: formData.addressLine1,
-        //         addressLine2: formData.addressLine2,
-        //         state: formData.state,
-        //         city: formData.city,
-        //         zip: formData.zip,
-        //         landmark: formData.landmark,
-        //         highestDegreeEarned: formData.highestDegreeEarned,
-        //         previousOrgName: formData.previousOrgName,
-        //         loggedInUserID: -1
-        //     };
+        try {
+            const ciData = {
+                riderID: riderID,
+                alternativeContactNumber: formData.alternativeContactNumber,
+                alternativeEmail: formData.alternativeEmail,
+                emergencyContactName: formData.emergencyContactName,
+                emergencyContactRelation: formData.emergencyContactRelation,
+                emergencyContactPersonID: formData.emergencyContactPersonID,
+                emergencyContactNumber: formData.emergencyContactNumber,
+                addressLine1: formData.addressLine1,
+                addressLine2: formData.addressLine2,
+                state: formData.state,
+                city: formData.city,
+                zip: formData.zip,
+                landmark: formData.landmark,
+                highestDegreeEarned: formData.highestDegreeEarned,
+                previousOrgName: formData.previousOrgName,
+                loggedInUserID: -1
+            };
 
-        //     if (riderID) {
-        //         let reqObj = { ...contactData, riderID };
-        //         await dispatch(updateRiderContactInformation(reqObj));
-        //     } else {
-        //         await dispatch(addRiderContactInformation(contactData));
-        //     }
-        //     setUpdateSuccess(true);
-        // } catch (err) {
-        //     console.error(err);
-        // } finally {
-        //     handleClose();
-        // }
-    };
+            if (riderID) {
+                await dispatch(updateRiderCI(ciData));
+                setUpdateSuccess(true);
+            }
 
-    const handleFinancialSave = async () => {
-        // try {
-        //     const financialData = {
-        //         bankName: formData.bankName,
-        //         accountNumber: formData.accountNumber,
-        //         ifscCode: formData.ifscCode,
-        //         uanNumber: formData.uanNumber,
-        //         insurancePolicyNumber: formData.insurancePolicyNumber,
-        //         insurerName: formData.insurerName,
-        //         insuranceStartDate: formData.insuranceStartDate,
-        //         insuranceEndDate: formData.insuranceEndDate
-        //     };
-
-        //     if (riderID) {
-        //         await dispatch(updateRiderFinancialDetails(financialData));
-        //         setUpdateSuccess(true);
-        //     }
-        // } catch (err) {
-        //     console.error(err);
-        // } finally {
-        //     handleClose();
-        // }
-    };
-    const handleAdditionalChecksSave = async () => {
-        // try {
-        //     const additionalChecksData = {
-        //         familyMembers: formData.familyMembers.map(member => ({
-        //             name: member.name,
-        //             familyMemberRelation: member.familyMemberRelation,
-        //             familyMemberIDType: member.familyMemberIDType,
-        //             familyMemberID: member.familyMemberID,
-        //             contactNumber: member.contactNumber
-        //         })),
-        //         backgroundVerification: {
-        //             completed: formData.backgroundVerification.completed,
-        //             agencyName: formData.backgroundVerification.agencyName || "N/A",
-        //             physicalVerificationCompleted: formData.backgroundVerification.physicalVerificationCompleted,
-        //             isAadhaarVerificationDone: formData.backgroundVerification.isAadhaarVerificationDone,
-        //             isContactNumberVerified: formData.backgroundVerification.isContactNumberVerified
-        //         },
-        //         attachments: formData.attachments
-        //     };
-
-        //     if (riderID) {
-        //         await dispatch(updateAdditionalChecksDetails(additionalChecksData));
-        //         setUpdateSuccess(true);
-        //     }
-        // } catch (err) {
-        //     console.error(err);
-        // } finally {
-        //     handleClose();
-        // }
-    };
-    const isFieldValid = (field) => {
-        if (field === "emailID" || field === "alternativeEmail") {
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return emailRegex.test(formData[field]);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            handleClose();
         }
-        else if (field === "alternativeContactNumber" || field === "emergencyContactNumber") {
-            const contactNumberRegex = /^\d{10}$/;
-            return contactNumberRegex.test(formData[field]);
-        }
-        else if(typeof formData[field] === "string") {
-            return formData[field].trim() !== "";
-        }
-        return formData[field] !== "";
     };
 
+    const handleFDSave = async () => {
+        try {
+            const financialData = {
+                riderID,
+                bankName: formData.bankName,
+                accountNumber: formData.accountNumber,
+                ifscCode: formData.ifscCode,
+                uanNumber: formData.uanNumber,
+                insurancePolicyNumber: formData.insurancePolicyNumber,
+                insurerName: formData.insurerName,
+                insuranceStartDate: formData.insuranceStartDate,
+                insuranceEndDate: formData.insuranceEndDate
+            };
 
+            if (riderID) {
+                await dispatch(updateRiderFD(financialData));
+                setUpdateSuccess(true);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            handleClose();
+        }
+    };
 
+    const handleACSave = async () => {
+        try {
+            const additionalChecksData = {
+                familyMembers: formData.familyMembers.map(member => ({
+                    name: member.name,
+                    familyMemberRelation: member.familyMemberRelation,
+                    familyMemberIDType: member.familyMemberIDType,
+                    familyMemberID: member.familyMemberID,
+                    contactNumber: member.contactNumber
+                })),
+                backgroundVerification: {
+                    completed: formData.backgroundVerification.completed,
+                    agencyName: formData.backgroundVerification.agencyName || "N/A",
+                    physicalVerificationCompleted: formData.backgroundVerification.physicalVerificationCompleted,
+                    isAadhaarVerificationDone: formData.backgroundVerification.isAadhaarVerificationDone,
+                    isContactNumberVerified: formData.backgroundVerification.isContactNumberVerified
+                },
+                attachments: formData.attachments
+            };
+
+            if (riderID) {
+                await dispatch(updateRiderAC(additionalChecksData));
+                setUpdateSuccess(true);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            handleClose();
+        }
+    };
+   
 
 
     return (
@@ -354,7 +354,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                         />
                                     </Grid>
                                     <Grid size={5} sx={{ marginTop: 1 }} >
-                                    <TextField
+                                        <TextField
                                             fullWidth
                                             label="Vendor Name"
                                             variant="outlined"
@@ -521,7 +521,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 variant="contained"
                                                 size="small"
                                                 color="primary"
-                                                onClick={() => handlePISave("PI")}
+                                                onClick={() => handlePISave()}
                                                 disabled={!isPanelValid(["fullName", "vendorID", "referenceName", "gender", "dateOfBirth", "aadharCardNumber", "panNumber", "contactNumber", "bloodGroup", "emailID"])}
                                             >
                                                 Save
@@ -771,7 +771,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                     variant="contained"
                                                     size="small"
                                                     color="primary"
-                                                    onClick={() => handleCISave("CI")}
+                                                    onClick={() => handleCISave()}
                                                     disabled={!isPanelValid(["alternativeContactNumber", "alternativeEmail", "emergencyContactName", "emergencyContactRelation", "emergencyContactPersonID", "emergencyContactNumber", "addressLine1", "addressLine2", "state", "city", "zip", "landmark", "highestDegreeEarned", "previousOrgName"])}
                                                 >
                                                     Save
@@ -809,7 +809,6 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 label="Bank Account Number"
                                                 variant="outlined"
                                                 size="small"
-                                                type="number"
                                                 name="accountNumber"
                                                 value={formData.accountNumber}
                                                 onChange={handleChange}
@@ -935,8 +934,8 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 variant="contained"
                                                 size="small"
                                                 color="primary"
-                                                onClick={() => handleFinancialSave("FinancialDetails")}
-                                                disabled={!isPanelValid(["bankName", "accountNumber", "ifscCode", "uanNumber", "insurancePolicyNumber", "insurerName", "insuranceStartDate", "insuranceEndDate"])}
+                                                onClick={() => handleFDSave()}
+                                                disabled={!isPanelValid(["bankName", "accountNumber", "ifscCode", "uanNumber", "insurancePolicyNumber", "insurerName", "insuranceStartDate", "insuranceEndDate"])}  
                                             >
                                                 Save
                                             </Button>
@@ -1067,8 +1066,8 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                             variant="contained"
                                                             size="small"
                                                             color="primary"
-                                                            onClick={() => handleASSave()}
-                                                            disabled={!isPanelValid(["hasBackgroundVerification"])}
+                                                            onClick={() => handleACSave()}
+                                                            disabled={!isPanelValid(["familyMemberName", "familyMemberRelation", "familyMemberIDType", "familyMemberID", "contactNumber", "hasPhysicalVerificationDone", "isAadhaarVerificationDone", "isContactNumberVerified", "hasBackgroundVerification"])}
                                                         >
                                                             Save
                                                         </Button>
@@ -1082,7 +1081,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                             </Panel>
                             <Panel title="Attachments">
                                 <Grid container rowSpacing={0} columnSpacing={3} sx={{ paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent" }}>
-                                    <Typography variant="h7" sx={{  fontWeight: "bold" }}>Upload Rider Documents</Typography>
+                                    <Typography variant="h7" sx={{ fontWeight: "bold" }}>Upload Rider Documents</Typography>
                                     <Grid container rowSpacing={0} columnSpacing={3} size={12} sx={{ mt: 2 }}>
                                         <Grid size={5}>
                                             <FormControl fullWidth >
@@ -1135,7 +1134,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                         </Grid>
                                     </Grid>
                                     <Box gridColumn="span 12" sx={{ mt: 6 }}>
-                                        <Typography variant="h7" sx={{  fontWeight: "bold" }}>Uploaded Documents</Typography>
+                                        <Typography variant="h7" sx={{ fontWeight: "bold" }}>Uploaded Documents</Typography>
                                     </Box>
                                     <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" sx={{ mt: 3, maxHeight: 300 }}>
                                         <Box gridColumn="span 3">
