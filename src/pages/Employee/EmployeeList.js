@@ -13,14 +13,15 @@ import { faCheckSquare, faSquare, faCircleUser } from '@fortawesome/free-regular
 import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import EmployeeFormModal from './EmployeeFormModal';
 import ActivateEmployeeModal from './ActivateEmployeeModal';
+import UserRolesModal from '../employee/UserRolesModal';
 
 
 const CustomToolbar = () => {
     return (
-      <GridToolbarContainer>
-        <GridToolbarFilterButton />
-        <GridToolbarExport />
-      </GridToolbarContainer>
+        <GridToolbarContainer>
+            <GridToolbarFilterButton />
+            <GridToolbarExport />
+        </GridToolbarContainer>
     );
 };
 
@@ -33,6 +34,8 @@ const EmployeeList = () => {
     const [paginationModel, setPaginationModel] = useState({ page: 0, pageSize: 10 });
     const [activateModalOpen, setActivateModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
+    const [userRolesModalOpen, setUserRolesModalOpen] = useState(false);
+
 
     useEffect(() => {
         dispatch(fetchEmployees());
@@ -71,9 +74,10 @@ const EmployeeList = () => {
     };
 
     const handleAssignUserRole = (employee) => {
-        // Add logic to handle assigning roles to the employee
+        setSelectedEmployee(employee);
+        setUserRolesModalOpen(true); 
         console.log("Assign Roles", employee);
-    };
+    };   
 
     const handleActivateSubmit = (employee, comments, activationDate) => {
         // Add logic to handle activating the employee
@@ -84,15 +88,16 @@ const EmployeeList = () => {
         dispatch(fetchEmployees());
     };
 
+
     const iconStyle = { color: "black", fontSize: "1.5em" }
 
     const columns = [
         { field: 'firstName', headerName: 'First Name', flex: 1 },
-        { field: 'lastName', headerName: 'Last Name', flex: 1  },
-        { field: 'personalEmailID', headerName: 'Email', flex: 1  },
-        { field: 'contactNumber', headerName: 'Contact Number', flex: 0.7  },
-        { field: 'aadhaarNumber', headerName: 'Aadhaar Number', flex: 0.7  },
-        { field: 'panNumber', headerName: 'PAN Number', flex: 0.6  },
+        { field: 'lastName', headerName: 'Last Name', flex: 1 },
+        { field: 'personalEmailID', headerName: 'Email', flex: 1 },
+        { field: 'contactNumber', headerName: 'Contact Number', flex: 0.7 },
+        { field: 'aadhaarNumber', headerName: 'Aadhaar Number', flex: 0.7 },
+        { field: 'panNumber', headerName: 'PAN Number', flex: 0.6 },
         {
             field: 'actions',
             headerName: 'Actions',
@@ -118,7 +123,7 @@ const EmployeeList = () => {
                         sx={{ width: "40px", Height: "40px" }}
                     >
                         <Tooltip title="Activate Employee" arrow>
-                            <FontAwesomeIcon icon={(true)? faSquare : faCheckSquare } color='#1976d2' />
+                            <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='#1976d2' />
                         </Tooltip>
                     </IconButton>
                     <IconButton
@@ -135,16 +140,16 @@ const EmployeeList = () => {
             ),
         },
     ];
-    
-       
+
+
     return (
-        <Container component="main" maxWidth={false} sx={{ maxwidth: '100%'  }}>
+        <Container component="main" maxWidth={false} sx={{ maxwidth: '100%' }}>
             <CssBaseline />
             <Box sx={{ mt: 0 }}>
                 <Typography component="h3" variant="h5">
                     Employees
                 </Typography>
-                <Grid container spacing={3}>
+                <Grid container spacing={12}>
                     <Grid size={6}>
                         <TextField
                             variant="outlined"
@@ -179,10 +184,10 @@ const EmployeeList = () => {
                         }}
                         sx={{
                             "& .MuiDataGrid-footerContainer": {
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "space-between",
-                              flexWrap: "nowrap"
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                flexWrap: "nowrap"
                             },
                             "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
                                 margin: "0 8px"
@@ -202,6 +207,14 @@ const EmployeeList = () => {
                     handleClose={() => setActivateModalOpen(false)}
                     handleActivate={handleActivateSubmit}
                     employee={selectedEmployee}
+                />
+            )}
+            {selectedEmployee && (
+                <UserRolesModal
+                    open={setUserRolesModalOpen}
+                    handleClose={() => setUserRolesModalOpen(false)}
+                    handleActivate={() => { /* logic */ }}
+                    rider={selectedEmployee}
                 />
             )}
         </Container>
