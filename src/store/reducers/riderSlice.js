@@ -185,11 +185,11 @@ export const fetchRiderById = createAsyncThunk('riders/fetchRiderById', async (i
       throw new Error('Failed to fetch rider');
   }
   return response.json();
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(riders[0]);
-    }, 2000);
-  });
+  // return new Promise((resolve) => {
+  //   setTimeout(() => {
+  //     resolve(riders[0]);
+  //   }, 2000);
+  // });
 
 });
 

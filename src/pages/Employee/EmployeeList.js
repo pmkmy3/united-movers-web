@@ -211,7 +211,7 @@ const EmployeeList = () => {
             )}
             {selectedEmployee && (
                 <UserRolesModal
-                    open={setUserRolesModalOpen}
+                    open={userRolesModalOpen}
                     handleClose={() => setUserRolesModalOpen(false)}
                     handleActivate={() => { /* logic */ }}
                     rider={selectedEmployee}

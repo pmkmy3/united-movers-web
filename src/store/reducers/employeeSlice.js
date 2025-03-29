@@ -158,31 +158,31 @@ const employees = [
 ]
 
 export const fetchEmployees = createAsyncThunk('employees/fetchEmployees', async () => {
-    // let url = `${API_BASE_URL}Employee`;
-    // const response = await fetch(url);
-    // if (!response.ok) {
-    //     throw new Error('Failed to fetch employees');
-    // }
-    // return response.json();
+    let url = `${API_BASE_URL}Employee`;
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Failed to fetch employees');
+    }
+    return response.json();
 
-    return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(employeeList);
-        }, 2000);
-      });
+    // return new Promise((resolve) => {
+    //     setTimeout(() => {
+    //       resolve(employeeList);
+    //     }, 2000);
+    //   });
 });
 
 export const fetchEmployeeById = createAsyncThunk('employees/fetchEmployeeById', async (id) => {
-    // const response = await fetch(`${API_BASE_URL}Employee/${id}`);
-    // if (!response.ok) {
-    //     throw new Error('Failed to fetch employee');
-    // }
-    // return response.json();
-    return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(employees[0]);
-        }, 2000);
-    });
+    const response = await fetch(`${API_BASE_URL}Employee/${id}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch employee');
+    }
+    return response.json();
+    // return new Promise((resolve) => {
+    //     setTimeout(() => {
+    //       resolve(employees[0]);
+    //     }, 2000);
+    // });
 });
 
 
