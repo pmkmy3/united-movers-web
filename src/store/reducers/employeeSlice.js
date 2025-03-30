@@ -263,7 +263,7 @@ export const updateEmployeeFinancialDetails = createAsyncThunk('employees/update
 });
 
 export const updateEmployeeAdminSection = createAsyncThunk('employees/updateEmployeeAdminSection', async (employeeAS) => {
-    const response = await fetch(`${API_BASE_URL}/${employeeAS.employeeID}`, {
+    const response = await fetch(`${API_BASE_URL}Employee/UpdateBackgroundVerification`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(employeeAS)

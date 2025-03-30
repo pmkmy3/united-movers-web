@@ -11,6 +11,9 @@ import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-svg-icons';
+import {
+    DataGrid
+} from '@mui/x-data-grid';
 
 
 const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) => {
@@ -89,7 +92,9 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                     createdDate: data.createdDate ? data.createdDate.split('T')[0] : "",
                     modifiedDate: data.modifiedDate ? data.modifiedDate.split('T')[0] : "",
                     insuranceStartDate: data.insuranceStartDate ? data.insuranceStartDate.split('T')[0] : "",
-                    insuranceEndDate: data.insuranceEndDate ? data.insuranceEndDate.split('T')[0] : ""
+                    insuranceEndDate: data.insuranceEndDate ? data.insuranceEndDate.split('T')[0] : "",
+                    isBackgroundVerificationCompleted: data.isBackgroundVerificationCompleted ? "Yes" : "No",
+                    isPhysicalVerificationCompleted: data.isPhysicalVerificationCompleted ? "Yes" : "No",
                 });
             }
         }
@@ -150,10 +155,10 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                 if (!/^\d*$/.test(value) || value.length > 10) return;
                 break;
             }
-            case 'hasBackgroundVerification': {
+            case 'isBackgroundVerificationCompleted': {
                 if (value === "Yes") {
-                    formData = {...formData, hasPhysicalVerificationDone : "No"};
-                    formData.agencyName = "";
+                    formData = {...formData, isPhysicalVerificationCompleted : "No"};
+                    formData.backgroundVerificationAgencyName = "";
                 }
                 break;
             }
@@ -175,7 +180,10 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
             const contactNumberRegex = /^\d{10}$/;
             return contactNumberRegex.test(formData[field]);
         }
-        return formData[field] && formData[field].trim() !== "";
+        else if (typeof formData[field] === "string") {
+            return formData[field].trim() !== "";
+        }
+        return formData[field] !== "";
     };
 
     const getFieldError = (field) => {
@@ -271,17 +279,19 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
 
     const handleASSave = async () => {
         try{
+
             const aData = {
-                hasBackgroundVerification: formData.hasBackgroundVerification,
-                agencyName: formData.agencyName,
-                hasPhysicalVerificationDone: formData.hasPhysicalVerificationDone
+                employeeID,
+                isBackgroundVerificationCompleted: formData.isBackgroundVerificationCompleted === "Yes",
+                backgroundVerificationAgencyName: formData.isBackgroundVerificationCompleted === "Yes" ? formData.backgroundVerificationAgencyName : "",
+                isPhysicalVerificationCompleted: formData.isBackgroundVerificationCompleted === "Yes" ? formData.isPhysicalVerificationCompleted === "Yes" : false
             }
             if (employeeID) {
-                let data = await dispatch(updateEmployeeAdminSection(...aData, employeeID));
+                await dispatch(updateEmployeeAdminSection(aData));
             }
         }
         catch(err){
-            
+            console.error(err);
         } finally {
             handleClose();
         }
@@ -328,13 +338,13 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
 
     const columns = [
         { field: 'attachmentType', headerName: 'Document Type', flex: 1 },
-        { field: 'attachmentName', headerName: 'Name', flex: 1 },
-        { field: 'numberOfKB', headerName: 'Size (KB)', flex: 1 },
+        { field: 'attachmentName', headerName: 'Name', flex: 1.5 },
+        { field: 'numberOfKB', headerName: 'Size (KB)', flex: 0.5 },
         { field: 'lastModifiedDate', headerName: 'Last Modified Date', flex: 1 },
         {
             field: 'actions',
             headerName: 'Actions',
-            flex: 1,
+            flex: 0.5,
             sortable: false, filterable: false,
             renderCell: (params) => (
                 <div style={{ display: 'flex' }}>
@@ -998,34 +1008,33 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                                             <RadioGroup
                                                 row
                                                 aria-label="background-verification"
-                                                name="hasBackgroundVerification"
-                                                value={formData.hasBackgroundVerification ?? "No"}
+                                                name="isBackgroundVerificationCompleted"
+                                                value={formData.isBackgroundVerificationCompleted ?? "No"}
                                                 onChange={handleChange}
                                             >
                                                 <FormControlLabel value="Yes" control={<Radio />} labelPlacement="end" label="Yes" />
                                                 <FormControlLabel value="No" control={<Radio />} labelPlacement="end" label="No" />
-                                                <FormControlLabel value="NA" control={<Radio />} labelPlacement="end" label="N/A" />
                                             </RadioGroup>
                                         </FormControl>
                                     </Grid>
                                     {
-                                        formData.hasBackgroundVerification === "Yes" && 
+                                        formData.isBackgroundVerificationCompleted == "Yes" && 
                                         <>
                                             <Grid size={5}>
-                                            <TextField
-                                                fullWidth
-                                                label="Agency Name"
-                                                variant="outlined"
-                                                size="small"
-                                                name="agencyName"
-                                                value={formData.agencyName}
-                                                onChange={handleChange}
-                                                onBlur={handleBlur}
-                                                required
-                                                error={!isFieldValid("agencyName") && touched.agencyName}
-                                                helperText={getFieldError("agencyName")}
-                                                maxLength={80}
-                                            />
+                                                <TextField
+                                                    fullWidth
+                                                    label="Agency Name"
+                                                    variant="outlined"
+                                                    size="small"
+                                                    name="backgroundVerificationAgencyName"
+                                                    value={formData.backgroundVerificationAgencyName}
+                                                    onChange={handleChange}
+                                                    onBlur={handleBlur}
+                                                    required
+                                                    error={!isFieldValid("backgroundVerificationAgencyName") && touched.backgroundVerificationAgencyName}
+                                                    helperText={getFieldError("backgroundVerificationAgencyName")}
+                                                    maxLength={80}
+                                                />
                                             </Grid>
                                             <Grid size={10}>
                                             <FormControl component="fieldset">
@@ -1033,13 +1042,12 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                                                 <RadioGroup
                                                     row
                                                     aria-label="physical-verification"
-                                                    name="hasPhysicalVerificationDone"
-                                                    value={formData.hasPhysicalVerificationDone ?? "No"}
+                                                    name="isPhysicalVerificationCompleted"
+                                                    value={formData.isPhysicalVerificationCompleted ?? "No"}
                                                     onChange={handleChange}
                                                 >
                                                     <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
                                                     <FormControlLabel value="No" control={<Radio />} label="No" />
-                                                    <FormControlLabel value="NA" control={<Radio />} label="N/A" />
                                                 </RadioGroup>
                                             </FormControl>
                                             </Grid>
@@ -1054,7 +1062,7 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                                                 size="small"
                                                 color="primary"
                                                 onClick={() => handleASSave()}
-                                                disabled={!isPanelValid(["hasBackgroundVerification"])}
+                                                disabled={!isPanelValid(["isBackgroundVerificationCompleted"])}
                                             >
                                                 Save
                                             </Button>
@@ -1124,48 +1132,19 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                                     <Box gridColumn="span 12" sx={{mt: 3}}>
                                         <Typography variant="h7" sx={{ fontWeight: 900}}>Uploaded Documents</Typography>
                                     </Box>
-                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12">
-                                        <Box gridColumn="span 3" >
-                                            <Typography sx={{ fontWeight: 700}}>Document Type</Typography> 
-                                        </Box>
-                                        <Box gridColumn="span 4" >
-                                            <Typography sx={{ fontWeight: 700}}>Name</Typography>
-                                        </Box>
-                                        <Box gridColumn="span 2" >
-                                            <Typography sx={{ fontWeight: 700}}>Size in KB's</Typography>
-                                        </Box>
-                                        <Box gridColumn="span 2" >
-                                            <Typography sx={{ fontWeight: 700}}>Last Modified Date</Typography>
-                                        </Box>
-                                        <Box gridColumn="span 1" >
-                                            <Typography sx={{ fontWeight: 700}}>Actions</Typography>
-                                        </Box>
-                                        {attachments.map((attachment, index) => (
-                                            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index} >
-                                                <Box gridColumn="span 3" ><Typography>{attachment.attachmentType}</Typography></Box>
-                                                <Box gridColumn="span 4" ><Typography>{attachment.attachmentName}</Typography></Box>
-                                                <Box gridColumn="span 2" ><Typography>{attachment.numberOfKB}</Typography></Box>
-                                                <Box gridColumn="span 2" ><Typography>{attachment.lastModifiedDate?.toLocaleDateString()}</Typography></Box>
-                                                <Box gridColumn="span 1" >
-                                                    <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteAttachment(attachment.attachmentID)} />
-                                                </Box>
-                                            </Box>
-                                        ))}
-                                    </Box>
-                                    {/* <Grid container size={12}>
-                                        <Grid size={6}></Grid>
-                                        <Grid size={5} sx={{ textAlign: 'right', m: 2}}>
-                                            <Button
-                                                variant="contained"
-                                                size="small"
-                                                color="primary"
-                                                onClick={() => handleUploadSave()}
-                                            >
-                                                Save
-                                            </Button>
+                                    
+                                    <Grid container rowSpacing={0} columnSpacing={3} size={12} sx={{mt: 2}}>
+                                        <Grid size={11}>
+                                            <DataGrid
+                                                rows={attachments}
+                                                columns={columns}
+                                                rowHeight={30}
+                                                disableSelectionOnClick
+                                                getRowId={(row) => row.attachmentID}
+                                                hideFooterPagination={true}
+                                            />
                                         </Grid>
-
-                                    </Grid> */}
+                                    </Grid>
                                 </Grid>
                             </Panel>
                         </Tabs>
