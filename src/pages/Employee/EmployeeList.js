@@ -70,11 +70,6 @@ const EmployeeList = () => {
         setActivateModalOpen(true);
     };
 
-    const handleDelete = (row) => {
-        // Add logic to handle deleting the employee
-        console.log("Delete", row);
-    };
-
     const handleAssignUserRole = (employee) => {
         setSelectedEmployee(employee);
         setUserRolesModalOpen(true); 
@@ -89,9 +84,6 @@ const EmployeeList = () => {
     const reloadGrid = () => {
         dispatch(fetchEmployees());
     };
-
-
-    const iconStyle = { color: "black", fontSize: "1.5em" }
 
     const columns = [
         { field: 'firstName', headerName: 'First Name', flex: 1 },
@@ -108,16 +100,6 @@ const EmployeeList = () => {
             renderCell: (params) => (
                 <div style={{ display: 'flex' }}>
                     <EmployeeFormModal employeeID={params.row.employeeID} employeeDocumentTypes={employeeDocumentTypes} reloadGrid={reloadGrid} />
-                    <IconButton
-                        color="secondary"
-                        size="small"
-                        onClick={() => handleDelete(params.row)}
-                        sx={{ width: "40px", Height: "40px" }}
-                    >
-                        <Tooltip title="Delete Rider" arrow>
-                            <FontAwesomeIcon icon={faTrashCan} color='#1976d2' />
-                        </Tooltip>
-                    </IconButton>
                     <IconButton
                         color="secondary"
                         size="small"

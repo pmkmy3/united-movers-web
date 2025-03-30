@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchEmployeeById, fetchEmployeeAttachmentsById, addEmployee, updateEmployeePersonalInformation, 
     updateEmployeeContactInformation, updateEmployeeFinancialDetails, 
-    updateEmployeeAdminSection, updateEmployeeAttachments } from '../../store/reducers/employeeSlice';
+    updateEmployeeAdminSection, updateEmployeeAttachments, deleteEmployeeAttachment } from '../../store/reducers/employeeSlice';
 import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, 
     IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
     FormControlLabel, Radio, InputLabel, Select } from '@mui/material';
@@ -73,8 +73,16 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
 
     useEffect(() => {
         if (employeeID && open) {
-            dispatch(fetchEmployeeById(employeeID)).then((response) => {
-                const data = response.payload;
+            getEmployeeById();
+            getEmployeeAttachments();
+        }
+    }, [dispatch, employeeID, open]);
+
+    const getEmployeeById = async () => {
+        if (employeeID) {
+            const response = await dispatch(fetchEmployeeById(employeeID));
+            const data = response.payload;
+            if (data) {
                 setFormData({
                     ...data,
                     dateOfBirth: data.dateOfBirth ? data.dateOfBirth.split('T')[0] : "",
@@ -83,19 +91,32 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                     insuranceStartDate: data.insuranceStartDate ? data.insuranceStartDate.split('T')[0] : "",
                     insuranceEndDate: data.insuranceEndDate ? data.insuranceEndDate.split('T')[0] : ""
                 });
-            });
-            dispatch(fetchEmployeeAttachmentsById(employeeID)).then((response) => {
-                const data = response.payload;
-                data && setAttachments(data.map((item) => ({
-                    attachmentId: item.attachmentId,
-                    contentType: item.ContentType,
-                    documentType: item.documentType,
-                    attachmentName: item.attachmentName
-                    })
-                ));
+            }
+        }
+    }
+    const getEmployeeAttachments = async () => {
+        if (employeeID) {
+            const response = await dispatch(fetchEmployeeAttachmentsById(employeeID));
+            const data = response.payload;
+            let attachmentResponse = data.map((item) => ({
+                attachmentID: item.attachmentID,
+                contentType: item.contentType,
+                attachmentType: item.attachmentType,
+                attachmentName: item.attachmentName,
+                numberOfKB: item.numberOfKB,
+                lastModifiedDate: item.lastModifiedDate?.toLocaleDateString(),
+            }));
+            setAttachments(attachmentResponse);
+        }
+    }
+
+    const handleDeleteAttachment = (id) => {
+        if(id) {
+            dispatch(deleteEmployeeAttachment(id)).then(() => {
+                getEmployeeAttachments();
             });
         }
-    }, [dispatch, employeeID, open]);
+    }
 
     useEffect(() => {
         if (updateSuccess) {
@@ -117,18 +138,6 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
         setDocumentType(e.target.value);
         setUploadedFile(null);
     }
-
-    // const handleAddAttachmentFile = () => {
-    //     if(uploadedFile && documentType) {
-    //         setAttachments([...attachments, {uploadedFile, documentType, lastModifiedDate: new Date()}]);
-    //         setDocumentType('');
-    //         setUploadedFile(null);
-    //     }
-    // }
-
-    // const handleDeleteAttachment = (index) => {
-    //     setAttachments(attachments.filter((_, i) => i !== index));
-    // }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -278,17 +287,6 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
         }
     }
 
-    function readFileContent(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsArrayBuffer(file);
-            reader.onload = () => {
-                resolve(Array.from(new Uint8Array(reader.result)));
-            };
-            reader.onerror = error => reject(error);
-        });
-    }
-
     const getBase64String = (file) => {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -315,17 +313,43 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                 attachmentType: "",
                 attachmentName: uploadedFile.name,
                 contentType: uploadedFile.type,
-                numberOfKB: uploadedFile.size,
+                numberOfKB: uploadedFile.size.toString(),
                 content: await getBase64String(uploadedFile),
                 loggedInUserID: 1,
                 attachmentID: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
             }
             const response = await dispatch(updateEmployeeAttachments(data));
             if (response.payload) {
-                setAttachments([...attachments, { attachmentId: response.payload.attachmentId, documentType, attachmentName: uploadedFile.name }]);
+                //setAttachments([...attachments, { attachmentId: response.payload.attachmentId, documentType, attachmentName: uploadedFile.name }]);
+                getEmployeeAttachments();
             }
         }
     }
+
+    const columns = [
+        { field: 'attachmentType', headerName: 'Document Type', flex: 1 },
+        { field: 'attachmentName', headerName: 'Name', flex: 1 },
+        { field: 'numberOfKB', headerName: 'Size (KB)', flex: 1 },
+        { field: 'lastModifiedDate', headerName: 'Last Modified Date', flex: 1 },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            flex: 1,
+            sortable: false, filterable: false,
+            renderCell: (params) => (
+                <div style={{ display: 'flex' }}>
+                    <IconButton
+                        color="secondary"
+                        size="small"
+                        onClick={() => handleDeleteAttachment(params.row.attachmentID)}
+                        sx={{ width: "40px", Height: "40px" }}
+                    >
+                        <Tooltip title="Delete Document" arrow><FontAwesomeIcon icon={faSquareMinus} /></Tooltip>
+                    </IconButton>
+                </div>
+            ),
+        },
+    ]
 
 
     return (
@@ -1097,36 +1121,36 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                                             />
                                         </Grid>
                                     </Grid>
-                                    <Box gridColumn="span 12" sx={{mt: 6}}>
+                                    <Box gridColumn="span 12" sx={{mt: 3}}>
                                         <Typography variant="h7" sx={{ fontWeight: 900}}>Uploaded Documents</Typography>
                                     </Box>
-                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" sx={{mt:3, maxHeight: 300}}>
-                                        <Box gridColumn="span 3">
+                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12">
+                                        <Box gridColumn="span 3" >
                                             <Typography sx={{ fontWeight: 700}}>Document Type</Typography> 
                                         </Box>
-                                        <Box gridColumn="span 4">
+                                        <Box gridColumn="span 4" >
                                             <Typography sx={{ fontWeight: 700}}>Name</Typography>
                                         </Box>
-                                        <Box gridColumn="span 2">
+                                        <Box gridColumn="span 2" >
                                             <Typography sx={{ fontWeight: 700}}>Size in KB's</Typography>
                                         </Box>
-                                        <Box gridColumn="span 2">
+                                        <Box gridColumn="span 2" >
                                             <Typography sx={{ fontWeight: 700}}>Last Modified Date</Typography>
                                         </Box>
-                                        <Box gridColumn="span 1">
+                                        <Box gridColumn="span 1" >
                                             <Typography sx={{ fontWeight: 700}}>Actions</Typography>
                                         </Box>
-                                        {/* {attachments.map((attachment, index) => (
-                                            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index} sx={{height: 25}}>
-                                                <Box gridColumn="span 3"><Typography>{attachment.documentType}</Typography></Box>
-                                                <Box gridColumn="span 4"><Typography>{attachment.uploadedFile?.name}</Typography></Box>
-                                                <Box gridColumn="span 2"><Typography>{attachment.uploadedFile?.size}</Typography></Box>
-                                                <Box gridColumn="span 2"><Typography>{attachment.lastModifiedDate?.toLocaleDateString()}</Typography></Box>
-                                                <Box gridColumn="span 1">
-                                                    <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteAttachment(index)} />
+                                        {attachments.map((attachment, index) => (
+                                            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index} >
+                                                <Box gridColumn="span 3" ><Typography>{attachment.attachmentType}</Typography></Box>
+                                                <Box gridColumn="span 4" ><Typography>{attachment.attachmentName}</Typography></Box>
+                                                <Box gridColumn="span 2" ><Typography>{attachment.numberOfKB}</Typography></Box>
+                                                <Box gridColumn="span 2" ><Typography>{attachment.lastModifiedDate?.toLocaleDateString()}</Typography></Box>
+                                                <Box gridColumn="span 1" >
+                                                    <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteAttachment(attachment.attachmentID)} />
                                                 </Box>
                                             </Box>
-                                        ))} */}
+                                        ))}
                                     </Box>
                                     {/* <Grid container size={12}>
                                         <Grid size={6}></Grid>

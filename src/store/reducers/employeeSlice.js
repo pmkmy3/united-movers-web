@@ -286,6 +286,17 @@ export const updateEmployeeAttachments = createAsyncThunk('employees/updateEmplo
     return response.json();
 });
 
+export const deleteEmployeeAttachment = createAsyncThunk('employees/deleteEmployeeAttachment', async (id) => {
+    const response = await fetch(`${API_BASE_URL}Employee/DeleteAttachment/${id}`, {
+        method: "DELETE",
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete employee attachments');
+    }
+    return response.json();
+});
+
 export const activateOrDeactivateEmployee = createAsyncThunk('employees/activateOrDeactivateEmployee', async (employee) => {
     const response = await fetch(`${API_BASE_URL}/${employee.employeeID}`, {
         method: "PUT",
@@ -476,6 +487,23 @@ const employeeSlice = createSlice({
                 }
             })
             .addCase(updateEmployeeAttachments.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(deleteEmployeeAttachment.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteEmployeeAttachment.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = '';
+                if (action.payload === true) {
+                    state.successMessage = 'Employee Attachment deleted successfully';
+                } else {
+                    state.error = 'Employee Attachment delete was failed';
+                }
+            })
+            .addCase(deleteEmployeeAttachment.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })
