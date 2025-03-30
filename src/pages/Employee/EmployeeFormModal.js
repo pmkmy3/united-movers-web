@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchEmployeeById, addEmployee, updateEmployeePersonalInformation, 
+import { useDispatch } from 'react-redux';
+import { fetchEmployeeById, fetchEmployeeAttachmentsById, addEmployee, updateEmployeePersonalInformation, 
     updateEmployeeContactInformation, updateEmployeeFinancialDetails, 
-    updateEmployeeAdminSection } from '../../store/reducers/employeeSlice';
+    updateEmployeeAdminSection, updateEmployeeAttachments } from '../../store/reducers/employeeSlice';
 import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, 
     IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
     FormControlLabel, Radio, InputLabel, Select } from '@mui/material';
@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-svg-icons';
 
 
-const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
+const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) => {
     const [open, setOpen] = useState(false);
     let [formData, setFormData] = useState({
         aadhaarNumber: "",
@@ -84,6 +84,16 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                     insuranceEndDate: data.insuranceEndDate ? data.insuranceEndDate.split('T')[0] : ""
                 });
             });
+            dispatch(fetchEmployeeAttachmentsById(employeeID)).then((response) => {
+                const data = response.payload;
+                data && setAttachments(data.map((item) => ({
+                    attachmentId: item.attachmentId,
+                    contentType: item.ContentType,
+                    documentType: item.documentType,
+                    attachmentName: item.attachmentName
+                    })
+                ));
+            });
         }
     }, [dispatch, employeeID, open]);
 
@@ -108,17 +118,17 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
         setUploadedFile(null);
     }
 
-    const handleAddAttachmentFile = () => {
-        if(uploadedFile && documentType) {
-            setAttachments([...attachments, {uploadedFile, documentType, lastModifiedDate: new Date()}]);
-            setDocumentType('');
-            setUploadedFile(null);
-        }
-    }
+    // const handleAddAttachmentFile = () => {
+    //     if(uploadedFile && documentType) {
+    //         setAttachments([...attachments, {uploadedFile, documentType, lastModifiedDate: new Date()}]);
+    //         setDocumentType('');
+    //         setUploadedFile(null);
+    //     }
+    // }
 
-    const handleDeleteAttachment = (index) => {
-        setAttachments(attachments.filter((_, i) => i !== index));
-    }
+    // const handleDeleteAttachment = (index) => {
+    //     setAttachments(attachments.filter((_, i) => i !== index));
+    // }
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -268,8 +278,53 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
         }
     }
 
+    function readFileContent(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(file);
+            reader.onload = () => {
+                resolve(Array.from(new Uint8Array(reader.result)));
+            };
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    const getBase64String = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1]; // Remove the metadata part
+                resolve(base64String);
+            };
+            reader.onerror = (error) => {
+                console.error("Error reading file:", error);
+                reject(error);
+            };
+        });
+    }
+
     const handleUploadSave = async () => {
-        
+        if(uploadedFile && documentType) {
+            setDocumentType('');
+            setUploadedFile(null);
+
+            const data = {
+                employeeID,
+                attachmentTypeID: documentType,
+                attachmentType: "",
+                attachmentName: uploadedFile.name,
+                contentType: uploadedFile.type,
+                numberOfKB: uploadedFile.size,
+                content: await getBase64String(uploadedFile),
+                loggedInUserID: 1,
+                attachmentID: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            }
+            const response = await dispatch(updateEmployeeAttachments(data));
+            if (response.payload) {
+                setAttachments([...attachments, { attachmentId: response.payload.attachmentId, documentType, attachmentName: uploadedFile.name }]);
+            }
+        }
     }
 
 
@@ -1000,11 +1055,11 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                                     value={documentType}
                                                     onChange={ handleDocumentTypeChange }
                                                 >
-                                                    <MenuItem value="adhaar">Adhaar</MenuItem>
-                                                    <MenuItem value="pan">PAN</MenuItem>
-                                                    <MenuItem value="payslips">Payslips</MenuItem>
-                                                    <MenuItem value="educationCertificates">Education Certificates</MenuItem>
-                                                    <MenuItem value="previousExperienceCertificates">Previous Experience Certificates</MenuItem>
+                                                    {employeeDocumentTypes && employeeDocumentTypes.map((document) => (
+                                                        <MenuItem key={document.documentTypeID} value={document.documentTypeID}>
+                                                            {document.documentType}
+                                                        </MenuItem>
+                                                    ))}
                                                 </Select>
                                             </FormControl>
                                         </Grid>
@@ -1036,7 +1091,7 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                             <FontAwesomeIcon icon={faSquarePlus}
                                                 size='2x'
                                                 color={ (documentType && uploadedFile) ? 'green' : 'gray' }
-                                                onClick={handleAddAttachmentFile}
+                                                onClick={() => handleUploadSave()}
                                                 style={{ cursor: (documentType && uploadedFile) ? "pointer" : "default"}}
                                                 disabled={!(documentType || uploadedFile)}
                                             />
@@ -1061,7 +1116,7 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                         <Box gridColumn="span 1">
                                             <Typography sx={{ fontWeight: 700}}>Actions</Typography>
                                         </Box>
-                                        {attachments.map((attachment, index) => (
+                                        {/* {attachments.map((attachment, index) => (
                                             <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index} sx={{height: 25}}>
                                                 <Box gridColumn="span 3"><Typography>{attachment.documentType}</Typography></Box>
                                                 <Box gridColumn="span 4"><Typography>{attachment.uploadedFile?.name}</Typography></Box>
@@ -1071,9 +1126,9 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                                     <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteAttachment(index)} />
                                                 </Box>
                                             </Box>
-                                        ))}
+                                        ))} */}
                                     </Box>
-                                    <Grid container size={12}>
+                                    {/* <Grid container size={12}>
                                         <Grid size={6}></Grid>
                                         <Grid size={5} sx={{ textAlign: 'right', m: 2}}>
                                             <Button
@@ -1086,7 +1141,7 @@ const EmployeeFormModal = ({ employeeID, reloadGrid }) => {
                                             </Button>
                                         </Grid>
 
-                                    </Grid>
+                                    </Grid> */}
                                 </Grid>
                             </Panel>
                         </Tabs>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchEmployees } from '../../store/reducers/employeeSlice';
+import { fetchEmployees, fetchEmployeeDocumentTypes } from '../../store/reducers/employeeSlice';
 import {
     DataGrid,
     GridToolbarContainer,
@@ -26,7 +26,8 @@ const CustomToolbar = () => {
 };
 
 const EmployeeList = () => {
-    const { employees, loading, error } = useSelector(state => state.employees);
+    const { employees, employeeDocumentTypes, loading, error } = useSelector(state => state.employees);
+
     const dispatch = useDispatch();
 
     const [searchText, setSearchText] = useState('');
@@ -39,6 +40,7 @@ const EmployeeList = () => {
 
     useEffect(() => {
         dispatch(fetchEmployees());
+        dispatch(fetchEmployeeDocumentTypes());
     }, [dispatch]);
 
     useEffect(() => {
@@ -105,7 +107,7 @@ const EmployeeList = () => {
             sortable: false, filterable: false,
             renderCell: (params) => (
                 <div style={{ display: 'flex' }}>
-                    <EmployeeFormModal employeeID={params.row.employeeID} reloadGrid={reloadGrid} />
+                    <EmployeeFormModal employeeID={params.row.employeeID} employeeDocumentTypes={employeeDocumentTypes} reloadGrid={reloadGrid} />
                     <IconButton
                         color="secondary"
                         size="small"
