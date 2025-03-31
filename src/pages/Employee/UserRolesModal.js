@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { fetchEmployeeRolesById, deleteEmployeeRole, assignEmployeeRoles } from '../../store/reducers/employeeSlice';
 import {
     Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem,
     IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
@@ -24,24 +26,38 @@ const style = {
     overflowY: 'auto'
 };
 
-const UserRolesModal = ({ open, handleClose, handleAssignRoles, employeeID }) => {
-    const [role, setRole] = useState('role1');
+const UserRolesModal = ({ employeeRoles, open, handleClose, handleAssignRoles, employeeID }) => {
+    const [role, setRole] = useState('');
     const [selectedPermission, setSelectedPermission] = useState("Read-Only");
     const [description, setDescription] = useState('');
     const [error, setError] = useState({ description: '', roles: '' });
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
     const [roles, setRoles] = useState([]);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (employeeID && open) {
-
+            getEmployeeRolesById();
         }
     }
     , [employeeID, open]);
 
 
-    const handleSave = () => {
-
+    const getEmployeeRolesById = async () => {
+        if (employeeID) {
+            const response = await dispatch(fetchEmployeeRolesById(employeeID));
+            const data = response.payload;
+            let roleResponse = data.map((item) => ({
+                mappingID: item.mappingID,
+                roleID: item.roleID,
+                roleName: item.roleName,
+                comments: item.comments,
+                isActive: item.isActive,
+                isReadOnly: item.isReadOnly,
+                isReadWrite: item.isReadWrite
+            }));
+            setRoles(roleResponse);
+        }
     }
 
     const handleRoleChanges = (e) => {
@@ -58,13 +74,34 @@ const UserRolesModal = ({ open, handleClose, handleAssignRoles, employeeID }) =>
         }
     };
 
-    const handleDeleteRole = (index) => {
-        setRoles(roles.filter((_, i) => i !== index));
+    const handleDeleteRole = (id) => {
+        if(id) {
+            dispatch(deleteEmployeeRole(id)).then(() => {
+                getEmployeeRolesById();
+            });
+        }
     }
 
-    const handleAddRole = () => {
-        if (roles && selectedPermission) {
-            setRoles([...roles, { role, selectedPermission, description }]);
+    const handleAddRole = async() => {
+        if(role && description && selectedPermission) {
+            const data = {
+                mappingID: 0,
+                employeeID,
+                roleID: role,
+                roleName: "",
+                comments: description,
+                isReadOnly: selectedPermission === "Read-Only",
+                isReadWrite: selectedPermission === "Read-Write",
+                isActive: true
+            };
+            const response = await dispatch(assignEmployeeRoles(data));
+            if (response.payload) {
+                setSelectedPermission("Read-Only");
+                setDescription('');
+                setRole('');
+                setError({ description: '', roles: '' });
+                getEmployeeRolesById();
+            }
         }
     }
 
@@ -99,8 +136,11 @@ const UserRolesModal = ({ open, handleClose, handleAssignRoles, employeeID }) =>
                                 value={role}
                                 onChange={handleRoleChanges}
                             >
-                                <MenuItem value="role1">Role1</MenuItem>
-                                <MenuItem value="role2">Role2</MenuItem>
+                                {employeeRoles && employeeRoles.map((role) => (
+                                    <MenuItem key={role.roleID} value={role.roleID}>
+                                        {role.roleName}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </Grid>
@@ -156,42 +196,28 @@ const UserRolesModal = ({ open, handleClose, handleAssignRoles, employeeID }) =>
                     <Typography variant="h7" sx={{ fontWeight: "bold" }}>Role Details</Typography>
                 </Box>
                 <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" sx={{ mt: 3, maxHeight: 300 }}>
-                    <Box gridColumn="span 1">
+                    <Box gridColumn="span 3">
                         <Typography sx={{ fontWeight: 700 }}>Role</Typography>
                     </Box>
-                    <Box gridColumn="span 4">
+                    <Box gridColumn="span 2">
                         <Typography sx={{ fontWeight: 700 }}>Permission</Typography>
                     </Box>
                     <Box gridColumn="span 4">
-                        <Typography sx={{ fontWeight: 700 }}>Description</Typography>
+                        <Typography sx={{ fontWeight: 700 }}>Comments</Typography>
                     </Box>
                     <Box gridColumn="span 2">
                         <Typography sx={{ fontWeight: 700 }}>Actions</Typography>
                     </Box>
                     {roles.map((role, index) => (
                         <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index} sx={{ maxHeight: 25 }}>
-                            <Box gridColumn="span 1"><Typography>{role.role} </Typography></Box>
-                            <Box gridColumn="span 4"><Typography>{role.selectedPermission}</Typography></Box>
-                            <Box gridColumn="span 4"><Typography>{role.description}</Typography></Box>
+                            <Box gridColumn="span 3"><Typography>{role.roleName} </Typography></Box>
+                            {role.isReadOnly ? <Box gridColumn="span 2"><Typography>Read-Only</Typography></Box> : <Box gridColumn="span 2"><Typography>Read-Write</Typography></Box>}
+                            <Box gridColumn="span 4"><Typography>{role.comments}</Typography></Box>
                             <Box gridColumn="span 2">
-                                <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteRole(index)} />
+                                <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteRole(role.mappingID)} />
                             </Box>
                         </Box>
                     ))}
-                </Box>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 3 }}>
-                    <Button
-                        type="submit"
-                        fullWidth
-                        size='small'
-                        variant="contained"
-                        color="primary"
-                        onClick={handleSave}
-                        sx={{ maxWidth: 150 }}
-                        disabled={isButtonDisabled}
-                    >
-                        Add
-                    </Button>
                 </Box>
             </Box>
         </Modal>

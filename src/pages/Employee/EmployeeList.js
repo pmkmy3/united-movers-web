@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchEmployees, fetchEmployeeDocumentTypes } from '../../store/reducers/employeeSlice';
+import { fetchEmployees, fetchEmployeeDocumentTypes, fetchEmployeeRoles } from '../../store/reducers/employeeSlice';
 import {
     DataGrid,
     GridToolbarContainer,
@@ -26,7 +26,7 @@ const CustomToolbar = () => {
 };
 
 const EmployeeList = () => {
-    const { employees, employeeDocumentTypes, loading, error } = useSelector(state => state.employees);
+    const { employees, employeeDocumentTypes, employeeRoles, loading, error } = useSelector(state => state.employees);
 
     const dispatch = useDispatch();
 
@@ -41,6 +41,7 @@ const EmployeeList = () => {
     useEffect(() => {
         dispatch(fetchEmployees());
         dispatch(fetchEmployeeDocumentTypes());
+        dispatch(fetchEmployeeRoles());
     }, [dispatch]);
 
     useEffect(() => {
@@ -107,7 +108,7 @@ const EmployeeList = () => {
                         sx={{ width: "40px", Height: "40px" }}
                     >
                         <Tooltip title="Activate Employee" arrow>
-                            <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='#1976d2' />
+                            <FontAwesomeIcon icon={(params.row.isActive) ? faCheckSquare : faSquare} color='#1976d2' />
                         </Tooltip>
                     </IconButton>
                     <IconButton
@@ -190,15 +191,16 @@ const EmployeeList = () => {
                     open={activateModalOpen}
                     handleClose={() => setActivateModalOpen(false)}
                     handleActivate={handleActivateSubmit}
-                    employee={selectedEmployee}
+                    employeeID={selectedEmployee.employeeID}
                 />
             )}
             {selectedEmployee && (
                 <UserRolesModal
+                    employeeRoles={employeeRoles} 
                     open={userRolesModalOpen}
                     handleClose={() => setUserRolesModalOpen(false)}
-                    handleActivate={() => { /* logic */ }}
-                    rider={selectedEmployee}
+                    handleAssignRoles={() => { /* logic */ }}
+                    employeeID={selectedEmployee.employeeID}
                 />
             )}
         </Container>

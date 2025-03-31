@@ -330,7 +330,6 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
             }
             const response = await dispatch(updateEmployeeAttachments(data));
             if (response.payload) {
-                //setAttachments([...attachments, { attachmentId: response.payload.attachmentId, documentType, attachmentName: uploadedFile.name }]);
                 getEmployeeAttachments();
             }
         }

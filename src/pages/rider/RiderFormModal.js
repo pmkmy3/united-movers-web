@@ -41,9 +41,9 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
         landmark: "",
         highestDegreeEarned: "",
         previousOrgName: "",
-        accountNumber: "",
+        bankAccountNumber: "",
         bankName: "",
-        ifscCode: "",
+        bankIFSCCode: "",
         uanNumber: "",
         insurancePolicyNumber: "",
         insurerName: "",
@@ -252,8 +252,8 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
             const financialData = {
                 riderID,
                 bankName: formData.bankName,
-                accountNumber: formData.accountNumber,
-                ifscCode: formData.ifscCode,
+                bankAccountNumber: formData.bankAccountNumber,
+                bankIFSCCode: formData.bankIFSCCode,
                 uanNumber: formData.uanNumber,
                 insurancePolicyNumber: formData.insurancePolicyNumber,
                 insurerName: formData.insurerName,
@@ -809,13 +809,13 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 label="Bank Account Number"
                                                 variant="outlined"
                                                 size="small"
-                                                name="accountNumber"
-                                                value={formData.accountNumber}
+                                                name="bankAccountNumber"
+                                                value={formData.bankAccountNumber}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("accountNumber") && touched.accountNumber}
-                                                helperText={getFieldError("accountNumber")}
+                                                error={!isFieldValid("bankAccountNumber") && touched.bankAccountNumber}
+                                                helperText={getFieldError("bankAccountNumber")}
                                             />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1 }}>
@@ -824,13 +824,13 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 label="IFSC Code"
                                                 variant="outlined"
                                                 size="small"
-                                                name="ifscCode"
-                                                value={formData.ifscCode}
+                                                name="bankIFSCCode"
+                                                value={formData.bankIFSCCode}
                                                 onChange={handleChange}
                                                 onBlur={handleBlur}
                                                 required
-                                                error={!isFieldValid("ifscCode") && touched.ifscCode}
-                                                helperText={getFieldError("ifscCode")}
+                                                error={!isFieldValid("bankIFSCCode") && touched.bankIFSCCode}
+                                                helperText={getFieldError("bankIFSCCode")}
                                             />
                                         </Grid>
                                     </Grid>
@@ -935,7 +935,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 size="small"
                                                 color="primary"
                                                 onClick={() => handleFDSave()}
-                                                disabled={!isPanelValid(["bankName", "accountNumber", "ifscCode", "uanNumber", "insurancePolicyNumber", "insurerName", "insuranceStartDate", "insuranceEndDate"])}  
+                                                disabled={!isPanelValid(["bankName", "bankAccountNumber", "bankIFSCCode", "uanNumber", "insurancePolicyNumber", "insurerName", "insuranceStartDate", "insuranceEndDate"])}  
                                             >
                                                 Save
                                             </Button>

@@ -181,6 +181,15 @@ export const fetchEmployeeDocumentTypes = createAsyncThunk('employees/fetchEmplo
     return response.json();
 });
 
+export const fetchEmployeeRoles = createAsyncThunk('employees/fetchEmployeeRoles', async () => {
+    let url = `${API_BASE_URL}Employee/GetEmployeeRoles`;
+    const response = await fetch(url);
+    if (!response.ok) {
+        throw new Error('Failed to fetch employee document types');
+    }
+    return response.json();
+});
+
 export const fetchEmployeeById = createAsyncThunk('employees/fetchEmployeeById', async (id) => {
     const response = await fetch(`${API_BASE_URL}Employee/${id}`);
     if (!response.ok) {
@@ -198,6 +207,14 @@ export const fetchEmployeeAttachmentsById = createAsyncThunk('employees/fetchEmp
     const response = await fetch(`${API_BASE_URL}Employee/GetAttachments/${id}`);
     if (!response.ok) {
         throw new Error('Failed to fetch employee attachments');
+    }
+    return response.json();
+});
+
+export const fetchEmployeeRolesById = createAsyncThunk('employees/fetchEmployeeRolesById', async (id) => {
+    const response = await fetch(`${API_BASE_URL}Employee/GetEmployeeAssignedRolesByEmplID/${id}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch employee roles');
     }
     return response.json();
 });
@@ -309,11 +326,11 @@ export const activateOrDeactivateEmployee = createAsyncThunk('employees/activate
     return response.json();
 });
 
-export const assignEmployeeRoles = createAsyncThunk('employees/assignEmployeeRoles', async (employee) => {
-    const response = await fetch(`${API_BASE_URL}/${employee.employeeID}`, {
+export const assignEmployeeRoles = createAsyncThunk('employees/assignEmployeeRoles', async (role) => {
+    const response = await fetch(`${API_BASE_URL}Employee/AddEmployeeRole`, {
         method: "PUT",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(employee)
+        body: JSON.stringify(role)
     });
     if (!response.ok) {
         throw new Error('Failed to update Employee Roles');
@@ -321,9 +338,21 @@ export const assignEmployeeRoles = createAsyncThunk('employees/assignEmployeeRol
     return response.json();
 });
 
+export const deleteEmployeeRole = createAsyncThunk('employees/deleteEmployeeRole', async (id) => {
+    const response = await fetch(`${API_BASE_URL}Employee/DeleteEmployeeRole/${id}`, {
+        method: "DELETE",
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete employee role');
+    }
+    return response.json();
+});
+
+
 const employeeSlice = createSlice({ 
     name: 'employees', 
-    initialState: { employees: [], employeeDocumentTypes: [], loading: false, error: '', successMessage: '' },
+    initialState: { employees: [], employeeDocumentTypes: [], employeeRoles: [], loading: false, error: '', successMessage: '' },
     extraReducers: (builder) => {
         builder
             .addCase(fetchEmployees.pending, (state) => {
@@ -354,6 +383,20 @@ const employeeSlice = createSlice({
                 state.loading = false;
                 state.error = action.error.message;
             })
+            .addCase(fetchEmployeeRoles.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchEmployeeRoles.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = '';
+                state.successMessage = 'Fetched All Employee Roles successfully';
+                state.employeeRoles = action.payload;
+            })
+            .addCase(fetchEmployeeRoles.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
             .addCase(fetchEmployeeById.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -380,7 +423,7 @@ const employeeSlice = createSlice({
             .addCase(fetchEmployeeAttachmentsById.fulfilled, (state, action) => {
                 state.loading = false;
                 state.error = '';
-                state.successMessage = 'Fetched Employee by id successfully';
+                state.successMessage = 'Fetched Employee Attachments by id successfully';
                 state.employees = state.employees.map((employee) => {
                     if (employee.employeeID === action.payload.employeeID) {
                         return action.payload;
@@ -389,6 +432,25 @@ const employeeSlice = createSlice({
                 });
             })
             .addCase(fetchEmployeeAttachmentsById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchEmployeeRolesById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchEmployeeRolesById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = '';
+                state.successMessage = 'Fetched Employee Roles by id successfully';
+                state.employees = state.employees.map((employee) => {
+                    if (employee.employeeID === action.payload.employeeID) {
+                        return action.payload;
+                    }
+                    return employee;
+                });
+            })
+            .addCase(fetchEmployeeRolesById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })
@@ -527,9 +589,30 @@ const employeeSlice = createSlice({
             .addCase(assignEmployeeRoles.fulfilled, (state, action) => {
                 state.loading = false;
                 state.error = '';
-                state.successMessage = 'Assigned Employee Roles successfully';
+                if (action.payload === true) {
+                    state.successMessage = 'Assigned Employee Roles successfully';
+                } else {
+                    state.error = 'Employee Role Assignment was failed';
+                }
             })
             .addCase(assignEmployeeRoles.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(deleteEmployeeRole.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(deleteEmployeeRole.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = '';
+                if (action.payload === true) {
+                    state.successMessage = 'Deleted Employee Role successfully';
+                } else {
+                    state.error = 'Employee Role delete was failed';
+                }
+            })
+            .addCase(deleteEmployeeRole.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })

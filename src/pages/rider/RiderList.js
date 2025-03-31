@@ -60,17 +60,7 @@ const RiderList = () => {
         setActivateModalOpen(true);
         console.log("Activate", row);
     };
-
-    // const handleDelete = (row) => {
-    //     // Add logic to handle deleting the rider
-    //     console.log("Delete", row);
-    // }
-    const handleDelete = (row) => {
     
-        dispatch(deleteRider(row.id))
-            .then(() => console.log("Deleted:", row))
-            .catch((error) => console.error("Error deleting rider:", error));
-    };
     const handleActivateSubmit = (rider, comments, activationDate) => {
         // Add logic to handle activating the rider
         console.log("Activate", rider, comments, activationDate);
@@ -98,21 +88,11 @@ const RiderList = () => {
                     <IconButton
                         color="secondary"
                         size="small"
-                        onClick={() => handleDelete(params.row)}
-                        sx={{ width: "40px", Height: "40px" }}
-                    >
-                        <Tooltip title="Delete Rider" arrow>
-                            <FontAwesomeIcon icon={faTrashCan} color='#1976d2' />
-                        </Tooltip>
-                    </IconButton>
-                    <IconButton
-                        color="secondary"
-                        size="small"
                         onClick={() => handleActivate(params.row)}
                         sx={{ width: "40px", Height: "40px" }}
                     >
                         <Tooltip title="Activate Rider" arrow>
-                            <FontAwesomeIcon icon={(true) ? faSquare : faCheckSquare} color='#1976d2' />
+                            <FontAwesomeIcon icon={(params.row.isActive) ? faCheckSquare : faSquare} color='#1976d2' />
                         </Tooltip>
                     </IconButton>
                 </div>

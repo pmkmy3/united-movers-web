@@ -16,7 +16,7 @@ const style = {
     width: 500
 };
 
-const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employee }) => {
+const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID }) => {
     const [comments, setComments] = useState('');
     const [activationDate, setActivationDate] = useState('');
     const [error, setError] = useState({ comments: '', activationDate: '' });
@@ -50,7 +50,14 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employee }) 
         setError(newError);
 
         if (!validationError) {
-            handleActivate(employee, comments, activationDate);
+            const activationObj = {
+                employeeID,
+                activateEmployee: true,
+                loggedInUser: "-1",
+                comments,
+                password: ""
+            }
+            handleActivate(employeeID, comments, activationDate);
             handleClose();
         }
     };
