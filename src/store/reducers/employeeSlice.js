@@ -226,7 +226,7 @@ export const addEmployee = createAsyncThunk('employees/addEmployee', async (empl
         body: JSON.stringify(employee),
         redirect: "follow"
     };
-    let url = `${API_BASE_URL}'Employee/ValidateAndCreateEmployeeID`;
+    let url = `${API_BASE_URL}Employee/ValidateAndCreateEmployeeID`;
     const response = await fetch(url, requestOptions);
     if (!response.ok) {
         throw new Error('Failed to add employee');
@@ -314,11 +314,11 @@ export const deleteEmployeeAttachment = createAsyncThunk('employees/deleteEmploy
     return response.json();
 });
 
-export const activateOrDeactivateEmployee = createAsyncThunk('employees/activateOrDeactivateEmployee', async (employee) => {
-    const response = await fetch(`${API_BASE_URL}/${employee.employeeID}`, {
+export const activateOrDeactivateEmployee = createAsyncThunk('employees/activateOrDeactivateEmployee', async (actObj) => {
+    const response = await fetch(`${API_BASE_URL}Employee/ActivateOrDeactivate`, {
         method: "PUT",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(employee)
+        body: JSON.stringify(actObj)
     });
     if (!response.ok) {
         throw new Error('Failed to update Employee Activation');

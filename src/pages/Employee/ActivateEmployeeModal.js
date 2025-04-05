@@ -16,11 +16,27 @@ const style = {
     width: 500
 };
 
-const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID }) => {
+const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID, isActive }) => {
+    const [title, setTitle] = useState('Activate Employee');
+    const [datePickerLabel, setDatePickerLabel] = useState('Activation Date');
+    const [buttonLabel, setButtonLabel] = useState('Activate');
+    
     const [comments, setComments] = useState('');
     const [activationDate, setActivationDate] = useState('');
     const [error, setError] = useState({ comments: '', activationDate: '' });
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+    useEffect(() => {
+        if(isActive) {
+            setTitle('Deactivate Employee');
+            setDatePickerLabel('Deactivation Date');
+            setButtonLabel('Deactivate');
+        }
+        setComments('');
+        setActivationDate('');
+        setError({ comments: '', activationDate: '' });
+        setIsButtonDisabled(true);
+    }, [open]);
 
     useEffect(() => {
         if (comments && activationDate && !error.comments && !error.activationDate) {
@@ -52,12 +68,13 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID }
         if (!validationError) {
             const activationObj = {
                 employeeID,
-                activateEmployee: true,
+                activateEmployee: !isActive,
                 loggedInUser: "-1",
                 comments,
                 password: ""
             }
-            handleActivate(employeeID, comments, activationDate);
+            // handleActivate(employeeID, comments, activationDate);
+            handleActivate(activationObj);
             handleClose();
         }
     };
@@ -95,7 +112,7 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID }
                 <Grid container spacing={3} size={12}>
                     <Grid size={6}>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Activate Employee
+                            {title}
                         </Typography>
                     </Grid>
                     <Grid size={6} sx={{ textAlign: 'right'}}>
@@ -125,7 +142,7 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID }
                     required
                     fullWidth
                     id="activationDate"
-                    label="Activation Date"
+                    label={datePickerLabel}
                     name="activationDate"
                     type="date"
                     slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: today } }}
@@ -148,7 +165,7 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID }
                         sx={{ maxWidth: 150 }}
                         disabled={isButtonDisabled}
                     >
-                        Activate
+                        {buttonLabel}
                     </Button>
                 </Box>
             </Box>

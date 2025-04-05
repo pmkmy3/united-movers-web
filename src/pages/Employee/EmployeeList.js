@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchEmployees, fetchEmployeeDocumentTypes, fetchEmployeeRoles } from '../../store/reducers/employeeSlice';
+import { fetchEmployees, fetchEmployeeDocumentTypes, fetchEmployeeRoles, activateOrDeactivateEmployee } from '../../store/reducers/employeeSlice';
 import {
     DataGrid,
     GridToolbarContainer,
@@ -74,12 +74,14 @@ const EmployeeList = () => {
     const handleAssignUserRole = (employee) => {
         setSelectedEmployee(employee);
         setUserRolesModalOpen(true); 
-        console.log("Assign Roles", employee);
     };   
 
-    const handleActivateSubmit = (employee, comments, activationDate) => {
-        // Add logic to handle activating the employee
-        console.log("Activate", employee, comments, activationDate);
+    const handleActivateSubmit = async (data) => {
+        const response = await dispatch(activateOrDeactivateEmployee(data));
+        if (response.payload) {
+            reloadGrid();
+        }
+        setActivateModalOpen(false);
     };
 
     const reloadGrid = () => {
@@ -192,6 +194,7 @@ const EmployeeList = () => {
                     handleClose={() => setActivateModalOpen(false)}
                     handleActivate={handleActivateSubmit}
                     employeeID={selectedEmployee.employeeID}
+                    isActive={selectedEmployee.isActive}
                 />
             )}
             {selectedEmployee && (
