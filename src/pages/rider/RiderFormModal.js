@@ -77,7 +77,9 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                 const data = response.payload;
                 setFormData({
                     ...data,
-                    dateOfBirth: data.dateOfBirth ? data.dateOfBirth.split('T')[0] : ""
+                    dateOfBirth: data.dateOfBirth ? data.dateOfBirth.split('T')[0] : "",
+                    insuranceStartDate: data.insuranceStartDate ? data.insuranceStartDate.split('T')[0] : "",
+                    insuranceEndDate: data.insuranceEndDate ? data.insuranceEndDate.split('T')[0] : ""
                 });
             });
         }
