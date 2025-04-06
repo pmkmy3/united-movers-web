@@ -235,22 +235,6 @@ export const activateRider = createAsyncThunk('riders/activateRider', async (rid
   }
   return response.json();
 });
-export const deleteRider = createAsyncThunk('riders/deleteRider', async (riderId) => { 
-  const requestOptions = {
-    method: "DELETE",
-    headers: { 'Content-Type': 'application/json' },
-    redirect: "follow"
-  };
-  
-  let url = `${API_BASE_URL}'Rider/deleteRider`;; // Adjust the URL accordingly
-  
-  const response = await fetch(url, requestOptions);
-  if (!response.ok) {
-    throw new Error('Failed to delete rider');
-  }
-  
-  return riderId; // Returning the ID to update state in Redux
-});
 
 
 export const updateRiderPI = createAsyncThunk('rider/updateRiderPI', async (riderPI) => {
@@ -299,7 +283,7 @@ export const updateRiderFD = createAsyncThunk('riders/updateRiderFD', async (rid
 });
 
 export const updateRiderAC = createAsyncThunk('riders/updateRiderAC', async (riderAC) => {
-  let url = `${API_BASE_URL}Rider/UpdateAdditionalChecks`;
+  let url = `${API_BASE_URL}Rider/UpdateBackgroundVerification`;
   const response = await fetch(url, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -476,20 +460,6 @@ const riderSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
-      .addCase(deleteRider.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(deleteRider.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = '';
-        state.successMessage = 'Deleted Rider successfully';
-        state.riders.push(action.payload);
-      })
-      .addCase(deleteRider.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message;
-      });
   }
 });
 

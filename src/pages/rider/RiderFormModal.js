@@ -79,7 +79,11 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                     ...data,
                     dateOfBirth: data.dateOfBirth ? data.dateOfBirth.split('T')[0] : "",
                     insuranceStartDate: data.insuranceStartDate ? data.insuranceStartDate.split('T')[0] : "",
-                    insuranceEndDate: data.insuranceEndDate ? data.insuranceEndDate.split('T')[0] : ""
+                    insuranceEndDate: data.insuranceEndDate ? data.insuranceEndDate.split('T')[0] : "",
+                    isPhysicalVerificationCompleted: data.isPhysicalVerificationCompleted ? "Yes" : "No",
+                    isAadhaarVerified: data.isAadhaarVerified ? "Yes" : "No",
+                    isContactNumberVerified: data.isContactNumberVerified ? "Yes" : "No",
+                    isBackgroundVerificationCompleted: data.isBackgroundVerificationCompleted ? "Yes" : "No",
                 });
             });
         }
@@ -129,10 +133,9 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                 if (!/^\d*$/.test(value) || value.length > 10) return;
                 break;
             }
-            case 'hasBackgroundVerification': {
+            case 'isBackgroundVerificationCompleted': {
                 if (value === "Yes") {
-                    formData = { ...formData, hasPhysicalVerificationDone: "No" };
-                    formData.agencyName = "";
+                    formData.backgroundVerificationAgencyName = "";
                 }
                 break;
             }
@@ -199,23 +202,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
             handleClose();
         }
     };
-    const handleASSave = async () => {
-        // try {
-        //     const aData = {
-        //         hasBackgroundVerification: formData.hasBackgroundVerification,
-        //         agencyName: formData.agencyName,
-        //         hasPhysicalVerificationDone: formData.hasPhysicalVerificationDone
-        //     }
-        //     if (riderID) {
-        //         let data = await dispatch(updateAdditionalChecksDetails(...aData, riderID));
-        //     }
-        // }
-        // catch (err) {
-
-        // } finally {
-        //     handleClose();
-        // }
-    }
+    
     const handleCISave = async () => {
         try {
             const ciData = {
@@ -276,24 +263,21 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
 
     const handleACSave = async () => {
         try {
-            const additionalChecksData = {
-                familyMembers: formData.familyMembers.map(member => ({
-                    name: member.name,
-                    familyMemberRelation: member.familyMemberRelation,
-                    familyMemberIDType: member.familyMemberIDType,
-                    familyMemberID: member.familyMemberID,
-                    contactNumber: member.contactNumber
-                })),
-                backgroundVerification: {
-                    completed: formData.backgroundVerification.completed,
-                    agencyName: formData.backgroundVerification.agencyName || "N/A",
-                    physicalVerificationCompleted: formData.backgroundVerification.physicalVerificationCompleted,
-                    isAadhaarVerificationDone: formData.backgroundVerification.isAadhaarVerificationDone,
-                    isContactNumberVerified: formData.backgroundVerification.isContactNumberVerified
-                },
-                attachments: formData.attachments
-            };
 
+            const additionalChecksData = {
+                riderID,
+                isBackgroundVerificationCompleted: formData.isBackgroundVerificationCompleted === "Yes",
+                isPhysicalVerificationCompleted: formData.isPhysicalVerificationCompleted === "Yes",
+                isAadhaarVerified: formData.isAadhaarVerified === "Yes",
+                isContactNumberVerified: formData.isContactNumberVerified === "Yes",
+                backgroundVerificationAgencyName: formData.isBackgroundVerificationCompleted === "Yes" ? formData.backgroundVerificationAgencyName : "",
+                familyMemberName: formData.familyMemberName,
+                familyMemberRelation: formData.familyMemberRelation,
+                familyMemberIDType: formData.familyMemberIDType,
+                familyMemberID: formData.familyMemberID,
+                familyMemberContact: formData.familyMemberContact,
+            }
+            
             if (riderID) {
                 await dispatch(updateRiderAC(additionalChecksData));
                 setUpdateSuccess(true);
@@ -965,7 +949,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                             <TextField fullWidth label="ID Number" variant="outlined" size="small" name="familyMemberID" error={!isFieldValid("familyMemberID") && touched.familyMemberID} value={formData.familyMemberID} helperText={getFieldError("familyMemberID")} onChange={handleChange} onBlur={handleBlur} required />
                                         </Grid>
                                         <Grid size={5} sx={{ marginTop: 1 }}>
-                                            <TextField fullWidth label="Contact Number" variant="outlined" size="small" name="contactNumber" error={!isFieldValid("contactNumber") && touched.contactNumber} helperText={getFieldError("contactNumber")} value={formData.contactNumber} onChange={handleChange} onBlur={handleBlur} required />
+                                            <TextField fullWidth label="Contact Number" variant="outlined" size="small" name="familyMemberContact" error={!isFieldValid("familyMemberContact") && touched.familyMemberContact} helperText={getFieldError("familyMemberContact")} value={formData.familyMemberContact} onChange={handleChange} onBlur={handleBlur} required />
                                         </Grid>
                                     </Grid>
 
@@ -980,13 +964,12 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 <RadioGroup
                                                     row
                                                     aria-label="physical-verification"
-                                                    name="hasPhysicalVerificationDone"
-                                                    value={formData.hasPhysicalVerificationDone ?? "No"}
+                                                    name="isPhysicalVerificationCompleted"
+                                                    value={formData.isPhysicalVerificationCompleted ?? "No"}
                                                     onChange={handleChange}
                                                 >
                                                     <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
                                                     <FormControlLabel value="No" control={<Radio />} label="No" />
-                                                    <FormControlLabel value="NA" control={<Radio />} label="N/A" />
                                                 </RadioGroup>
                                             </FormControl>
                                         </Grid>
@@ -996,13 +979,12 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 <RadioGroup
                                                     row
                                                     aria-label="Aadhaar-verification"
-                                                    name="isAadhaarVerificationDone"
-                                                    value={formData.isAadhaarVerificationDone ?? "No"}
+                                                    name="isAadhaarVerified"
+                                                    value={formData.isAadhaarVerified ?? "No"}
                                                     onChange={handleChange}
                                                 >
                                                     <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
                                                     <FormControlLabel value="No" control={<Radio />} label="No" />
-                                                    <FormControlLabel value="NA" control={<Radio />} label="N/A" />
                                                 </RadioGroup>
                                             </FormControl>
                                         </Grid>
@@ -1018,7 +1000,6 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 >
                                                     <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
                                                     <FormControlLabel value="No" control={<Radio />} label="No" />
-                                                    <FormControlLabel value="NA" control={<Radio />} label="N/A" />
                                                 </RadioGroup>
                                             </FormControl>
                                         </Grid>
@@ -1028,18 +1009,17 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                 <RadioGroup
                                                     row
                                                     aria-label="background-verification"
-                                                    name="hasBackgroundVerification"
-                                                    value={formData.hasBackgroundVerification ?? "No"}
+                                                    name="isBackgroundVerificationCompleted"
+                                                    value={formData.isBackgroundVerificationCompleted ?? "No"}
                                                     onChange={handleChange}
                                                 >
                                                     <FormControlLabel value="Yes" control={<Radio />} labelPlacement="end" label="Yes" />
                                                     <FormControlLabel value="No" control={<Radio />} labelPlacement="end" label="No" />
-                                                    <FormControlLabel value="NA" control={<Radio />} labelPlacement="end" label="N/A" />
                                                 </RadioGroup>
                                             </FormControl>
                                         </Grid>
                                         {
-                                            formData.hasBackgroundVerification === "Yes" &&
+                                            formData.isBackgroundVerificationCompleted === "Yes" &&
                                             <>
                                                 <Grid size={5}>
                                                     <TextField
@@ -1047,13 +1027,13 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                         label="Agency Name"
                                                         variant="outlined"
                                                         size="small"
-                                                        name="agencyName"
-                                                        value={formData.agencyName}
+                                                        name="backgroundVerificationAgencyName"
+                                                        value={formData.backgroundVerificationAgencyName}
                                                         onChange={handleChange}
                                                         onBlur={handleBlur}
                                                         required
-                                                        error={!isFieldValid("agencyName") && touched.agencyName}
-                                                        helperText={getFieldError("agencyName")}
+                                                        error={!isFieldValid("backgroundVerificationAgencyName") && touched.backgroundVerificationAgencyName}
+                                                        helperText={getFieldError("backgroundVerificationAgencyName")}
                                                         maxLength={80}
                                                     />
                                                 </Grid>
@@ -1069,7 +1049,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                             size="small"
                                                             color="primary"
                                                             onClick={() => handleACSave()}
-                                                            disabled={!isPanelValid(["familyMemberName", "familyMemberRelation", "familyMemberIDType", "familyMemberID", "contactNumber", "hasPhysicalVerificationDone", "isAadhaarVerificationDone", "isContactNumberVerified", "hasBackgroundVerification"])}
+                                                            disabled={!isPanelValid(["familyMemberName", "familyMemberRelation", "familyMemberIDType", "familyMemberID", "familyMemberContact", "isPhysicalVerificationCompleted", "isAadhaarVerified", "isContactNumberVerified", "isBackgroundVerificationCompleted"])}
                                                         >
                                                             Save
                                                         </Button>
