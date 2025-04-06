@@ -336,10 +336,10 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
     }
 
     const columns = [
-        { field: 'attachmentType', headerName: 'Document Type', flex: 1 },
-        { field: 'attachmentName', headerName: 'Name', flex: 1.5 },
-        { field: 'numberOfKB', headerName: 'Size (KB)', flex: 0.5 },
-        { field: 'lastModifiedDate', headerName: 'Last Modified Date', flex: 1 },
+        { field: 'attachmentType', headerName: 'Document Type', sortable: false, filterable: false, flex: 1 },
+        { field: 'attachmentName', headerName: 'Name', sortable: false, filterable: false, flex: 1.5 },
+        { field: 'numberOfKB', headerName: 'Size (KB)', sortable: false, filterable: false, flex: 0.5 },
+        { field: 'lastModifiedDate', headerName: 'Last Modified Date', sortable: false, filterable: false, flex: 1 },
         {
             field: 'actions',
             headerName: 'Actions',

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRiderById, addRider, updateRiderPI, updateRiderCI, updateRiderFD, updateRiderAC } from '../../store/reducers/riderSlice';
+import { fetchRiderById, addRider, updateRiderPI, updateRiderCI, updateRiderFD, updateRiderAC, 
+    updateRiderAttachments, fetchRiderAttachmentsById, deleteRiderAttachment } from '../../store/reducers/riderSlice';
 import {
     Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem,
     IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
@@ -11,9 +12,12 @@ import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-svg-icons';
+import {
+    DataGrid
+} from '@mui/x-data-grid';
 
 
-const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
+const RiderFormModal = ({ riderID, vendors, riderDocumentTypes, reloadGrid }) => {
 
     const [open, setOpen] = useState(false);
     let [formData, setFormData] = useState({
@@ -89,6 +93,22 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
         }
     }, [dispatch, riderID, open]);
 
+    const getRiderAttachments = async () => {
+        if (riderID) {
+            const response = await dispatch(fetchRiderAttachmentsById(riderID));
+            const data = response.payload;
+            let attachmentResponse = data.map((item) => ({
+                attachmentID: item.attachmentID,
+                contentType: item.contentType,
+                attachmentType: item.attachmentType,
+                attachmentName: item.attachmentName,
+                numberOfKB: item.numberOfKB,
+                lastModifiedDate: item.lastModifiedDate?.toLocaleDateString(),
+            }));
+            setAttachments(attachmentResponse);
+        }
+    }
+
     useEffect(() => {
         if (updateSuccess) {
             handleClose();
@@ -110,16 +130,50 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
         setUploadedFile(null);
     }
 
-    const handleAddAttachmentFile = () => {
-        if (uploadedFile && documentType) {
-            setAttachments([...attachments, { uploadedFile, documentType, lastModifiedDate: new Date() }]);
+    const getBase64String = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const base64String = reader.result.split(',')[1]; // Remove the metadata part
+                resolve(base64String);
+            };
+            reader.onerror = (error) => {
+                console.error("Error reading file:", error);
+                reject(error);
+            };
+        });
+    }
+
+    const handleAddAttachmentFile = async () => {
+        if(uploadedFile && documentType) {
             setDocumentType('');
             setUploadedFile(null);
+
+            const data = {
+                riderID,
+                attachmentTypeID: documentType,
+                attachmentType: "",
+                attachmentName: uploadedFile.name,
+                contentType: uploadedFile.type,
+                numberOfKB: uploadedFile.size.toString(),
+                content: await getBase64String(uploadedFile),
+                loggedInUserID: 1,
+                attachmentID: "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            }
+            const response = await dispatch(updateRiderAttachments(data));
+            if (response.payload) {
+                getRiderAttachments();
+            }
         }
     }
 
-    const handleDeleteAttachment = (index) => {
-        setAttachments(attachments.filter((_, i) => i !== index));
+    const handleDeleteAttachment = (id) => {
+        if(id) {
+            dispatch(deleteRiderAttachment(id)).then(() => {
+                getRiderAttachments();
+            });
+        }
     }
 
     const handleChange = (e) => {
@@ -289,7 +343,30 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
         }
     };
    
-
+    const columns = [
+        { field: 'attachmentType', headerName: 'Document Type', sortable: false, filterable: false, flex: 1 },
+        { field: 'attachmentName', headerName: 'Name', sortable: false, filterable: false, flex: 1.5 },
+        { field: 'numberOfKB', headerName: 'Size (KB)', sortable: false, filterable: false, flex: 0.5 },
+        { field: 'lastModifiedDate', headerName: 'Last Modified Date', sortable: false, filterable: false, flex: 1 },
+        {
+            field: 'actions',
+            headerName: 'Actions',
+            flex: 0.5,
+            sortable: false, filterable: false,
+            renderCell: (params) => (
+                <div style={{ display: 'flex' }}>
+                    <IconButton
+                        color="secondary"
+                        size="small"
+                        onClick={() => handleDeleteAttachment(params.row.attachmentID)}
+                        sx={{ width: "40px", Height: "40px" }}
+                    >
+                        <Tooltip title="Delete Document" arrow><FontAwesomeIcon icon={faSquareMinus} /></Tooltip>
+                    </IconButton>
+                </div>
+            ),
+        },
+    ]
 
     return (
         <>
@@ -310,6 +387,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
             <Modal
                 open={open}
                 onClose={handleClose}
+                slotProps={{ BackdropProps: { onClick: (e) => e.stopPropagation() } }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
@@ -1061,7 +1139,7 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
 
                                 </Box>
                             </Panel>
-                            <Panel title="Attachments">
+                            <Panel title="Uploads">
                                 <Grid container rowSpacing={0} columnSpacing={3} sx={{ paddingLeft: 5, overflowY: "auto", maxHeight: 400, backgroundColor: "transparent" }}>
                                     <Typography variant="h7" sx={{ fontWeight: "bold" }}>Upload Rider Documents</Typography>
                                     <Grid container rowSpacing={0} columnSpacing={3} size={12} sx={{ mt: 2 }}>
@@ -1076,8 +1154,13 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                                     value={documentType}
                                                     onChange={handleDocumentTypeChange}
                                                 >
-                                                    <MenuItem value="adhaar">Adhaar</MenuItem>
-                                                    <MenuItem value="pan">PAN</MenuItem>
+                                                    {
+                                                        riderDocumentTypes && riderDocumentTypes.map((document) => (
+                                                            <MenuItem key={document.documentTypeID} value={document.documentTypeID}>
+                                                                {document.documentType}
+                                                            </MenuItem>
+                                                        ))
+                                                    }
                                                 </Select>
                                             </FormControl>
                                         </Grid>
@@ -1118,34 +1201,20 @@ const RiderFormModal = ({ riderID, vendors, reloadGrid }) => {
                                     <Box gridColumn="span 12" sx={{ mt: 6 }}>
                                         <Typography variant="h7" sx={{ fontWeight: "bold" }}>Uploaded Documents</Typography>
                                     </Box>
-                                    <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" sx={{ mt: 3, maxHeight: 300 }}>
-                                        <Box gridColumn="span 3">
-                                            <Typography sx={{ fontWeight: 700 }}>Document Type</Typography>
-                                        </Box>
-                                        <Box gridColumn="span 4">
-                                            <Typography sx={{ fontWeight: 700 }}>Name</Typography>
-                                        </Box>
-                                        <Box gridColumn="span 2">
-                                            <Typography sx={{ fontWeight: 700 }}>Size in KB's</Typography>
-                                        </Box>
-                                        <Box gridColumn="span 2">
-                                            <Typography sx={{ fontWeight: 700 }}>Last Modified Date</Typography>
-                                        </Box>
-                                        <Box gridColumn="span 1">
-                                            <Typography sx={{ fontWeight: 700 }}>Actions</Typography>
-                                        </Box>
-                                        {attachments.map((attachment, index) => (
-                                            <Box display="grid" gridTemplateColumns="repeat(12, 1fr)" gap={1} gridColumn="span 12" key={index} sx={{ height: 25 }}>
-                                                <Box gridColumn="span 3"><Typography>{attachment.documentType}</Typography></Box>
-                                                <Box gridColumn="span 4"><Typography>{attachment.uploadedFile?.name}</Typography></Box>
-                                                <Box gridColumn="span 2"><Typography>{attachment.uploadedFile?.size}</Typography></Box>
-                                                <Box gridColumn="span 2"><Typography>{attachment.lastModifiedDate?.toLocaleDateString()}</Typography></Box>
-                                                <Box gridColumn="span 1">
-                                                    <FontAwesomeIcon icon={faSquareMinus} size='lg' color='red' style={{ cursor: 'pointer' }} onClick={() => handleDeleteAttachment(index)} />
-                                                </Box>
-                                            </Box>
-                                        ))}
-                                    </Box>
+                                    
+                                    <Grid container rowSpacing={0} columnSpacing={3} size={12} sx={{mt: 2}}>
+                                        <Grid size={11}>
+                                            <DataGrid
+                                                rows={attachments}
+                                                columns={columns}
+                                                rowHeight={30}
+                                                disableSelectionOnClick
+                                                getRowId={(row) => row.attachmentID}
+                                                hideFooterPagination={true}
+                                            />
+                                        </Grid>
+                                    </Grid>
+
                                     <Grid container size={12}>
                                         <Grid size={6}></Grid>
                                         <Grid size={5} sx={{ textAlign: 'right', m: 2 }}>

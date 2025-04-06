@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchRiders, fetchVendors } from '../../store/reducers/riderSlice';
+import { fetchRiders, fetchVendors, fetchRiderDocumentTypes } from '../../store/reducers/riderSlice';
 import {
     DataGrid,
     GridToolbarContainer,
@@ -25,7 +25,7 @@ const CustomToolbar = () => {
 };
 
 const RiderList = () => {
-    const { riders, vendors, loading, error } = useSelector(state => state.riders);
+    const { riders, vendors, riderDocumentTypes, loading, error } = useSelector(state => state.riders);
     const dispatch = useDispatch();
     const [searchText, setSearchText] = useState('');
     const [filteredRiders, setFilteredRiders] = useState([]);
@@ -36,6 +36,7 @@ const RiderList = () => {
     useEffect(() => {
         dispatch(fetchRiders());
         dispatch(fetchVendors());
+        dispatch(fetchRiderDocumentTypes());
     }, [dispatch]);
 
     useEffect(() => {
@@ -84,7 +85,7 @@ const RiderList = () => {
             filterable: false,
             renderCell: (params) => (
                 <div style={{ display: 'flex' }}>
-                    <RiderFormModal riderID={params.row.riderID} vendors={vendors} reloadGrid={reloadGrid} />
+                    <RiderFormModal riderID={params.row.riderID} vendors={vendors} riderDocumentTypes={riderDocumentTypes} reloadGrid={reloadGrid} />
                     <IconButton
                         color="secondary"
                         size="small"

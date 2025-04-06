@@ -207,6 +207,22 @@ export const fetchVendors = createAsyncThunk('vendors/fetchVendors', async () =>
   // });
 });
 
+export const fetchRiderDocumentTypes = createAsyncThunk('riders/fetchRiderDocumentTypes', async () => {
+  const response = await fetch(`${API_BASE_URL}Rider/GetRiderDocumentTypes`);
+  if (!response.ok) {
+      throw new Error('Failed to fetch rider document types');
+  }
+  return response.json();
+});
+
+export const fetchRiderAttachmentsById = createAsyncThunk('riders/fetchRiderAttachmentsById', async (id) => {
+    const response = await fetch(`${API_BASE_URL}Rider/GetAttachments/${id}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch rider attachments');
+    }
+    return response.json();
+});
+
 export const addRider = createAsyncThunk('riders/addRider', async (rider) => {
   const requestOptions = {
     method: "POST",
@@ -221,6 +237,7 @@ export const addRider = createAsyncThunk('riders/addRider', async (rider) => {
   }
   return response.json();
 });
+
 export const activateRider = createAsyncThunk('riders/activateRider', async (rider) => {
   const requestOptions = {
     method: "POST",
@@ -295,12 +312,34 @@ export const updateRiderAC = createAsyncThunk('riders/updateRiderAC', async (rid
   return response.json();
 });
 
+export const updateRiderAttachments = createAsyncThunk('riders/updateRiderAttachments', async (attachments) => {
+    const response = await fetch(`${API_BASE_URL}Rider/AddAttachment`, {
+        method: "PUT",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(attachments)
+    });
+    if (!response.ok) {
+        throw new Error('Failed to update riders Attachments');
+    }
+    return response.json();
+});
+
+export const deleteRiderAttachment = createAsyncThunk('riders/deleteRiderAttachment', async (id) => {
+    const response = await fetch(`${API_BASE_URL}Rider/DeleteAttachment/${id}`, {
+        method: "DELETE",
+        headers: { 'Content-Type': 'application/json' }
+    });
+    if (!response.ok) {
+        throw new Error('Failed to delete riders attachments');
+    }
+    return response.json();
+});
 
 
 
 const riderSlice = createSlice({
   name: 'riders',
-  initialState: { riders: [], vendors: [], rider:{}, loading: false, error: null },
+  initialState: { riders: [], vendors: [], riderDocumentTypes: [], rider:{}, loading: false, error: '', successMessage: '' },
   extraReducers: (builder) => {
     builder
       .addCase(fetchRiders.pending, (state) => {
@@ -327,6 +366,18 @@ const riderSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      .addCase(fetchRiderDocumentTypes.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchRiderDocumentTypes.fulfilled, (state, action) => {
+        state.loading = false;
+        state.riderDocumentTypes = action.payload;
+      })
+      .addCase(fetchRiderDocumentTypes.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
       .addCase(fetchRiderById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -341,6 +392,18 @@ const riderSlice = createSlice({
         });
       })
       .addCase(fetchRiderById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(fetchRiderAttachmentsById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchRiderAttachmentsById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.rider = action.payload;
+      })
+      .addCase(fetchRiderAttachmentsById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })
@@ -446,6 +509,41 @@ const riderSlice = createSlice({
         state.loading = false;
         state.error = action.error.message;
       })
+      .addCase(updateRiderAttachments.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateRiderAttachments.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = '';
+        if (action.payload === true) {
+            state.successMessage = 'Rider Attachments updated successfully';
+        } else {
+            state.error = 'Rider Attachments update was failed';
+        }
+      })
+      .addCase(updateRiderAttachments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(deleteRiderAttachment.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(deleteRiderAttachment.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = '';
+        if (action.payload === true) {
+            state.successMessage = 'Rider Attachment deleted successfully';
+        } else {
+            state.error = 'Rider Attachment deletion was failed';
+        }
+      })
+      .addCase(deleteRiderAttachment.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+
       .addCase(activateRider.pending, (state) => {
         state.loading = true;
         state.error = null;
