@@ -76,11 +76,12 @@ const RiderList = () => {
         { field: 'emailID', headerName: 'Email', flex: 1 },
         { field: 'contactNumber', headerName: 'Contact Number', flex: 0.6 },
         { field: 'aadharCardNumber', headerName: 'Aadhaar Number', flex: 0.6 },
+        { field: 'panNumber', headerName: 'PAN Number', flex: 0.6 },
         { field: 'vendorName', headerName: 'Vendor Name', flex: 0.6 },
         {
             field: 'actions',
             headerName: 'Actions',
-            flex: 0.8,
+            flex: 0.6,
             sortable: false,
             filterable: false,
             renderCell: (params) => (
