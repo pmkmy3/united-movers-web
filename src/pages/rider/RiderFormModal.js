@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchRiderById, addRider, updateRiderPI, updateRiderCI, updateRiderFD, updateRiderAC, 
-    updateRiderAttachments, fetchRiderAttachmentsById, deleteRiderAttachment } from '../../store/reducers/riderSlice';
+    updateRiderAttachments, fetchRiderAttachmentsById, deleteRiderAttachment, fetchDocumentContentById } from '../../store/reducers/riderSlice';
 import {
     Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem,
     IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
@@ -12,6 +12,7 @@ import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-svg-icons';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import {
     DataGrid
 } from '@mui/x-data-grid';
@@ -77,6 +78,13 @@ const RiderFormModal = ({ riderID, vendors, riderDocumentTypes, reloadGrid }) =>
 
     useEffect(() => {
         if (riderID && open) {
+            getRiderById();
+            getRiderAttachments();
+        }
+    }, [dispatch, riderID, open]);
+
+    const getRiderById = async () => {
+        if (riderID) {
             dispatch(fetchRiderById(riderID)).then((response) => {
                 const data = response.payload;
                 setFormData({
@@ -91,7 +99,7 @@ const RiderFormModal = ({ riderID, vendors, riderDocumentTypes, reloadGrid }) =>
                 });
             });
         }
-    }, [dispatch, riderID, open]);
+    }
 
     const getRiderAttachments = async () => {
         if (riderID) {
@@ -173,6 +181,30 @@ const RiderFormModal = ({ riderID, vendors, riderDocumentTypes, reloadGrid }) =>
             dispatch(deleteRiderAttachment(id)).then(() => {
                 getRiderAttachments();
             });
+        }
+    }
+
+     const handleDownloadDocument = async (id) => {
+        if (id) {
+            const response = await dispatch(fetchDocumentContentById(id));
+            const data = response.payload;
+            if (data) {
+                const byteCharacters = atob(data.content);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: data.contentType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = data.attachmentName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
         }
     }
 
@@ -361,7 +393,15 @@ const RiderFormModal = ({ riderID, vendors, riderDocumentTypes, reloadGrid }) =>
                         onClick={() => handleDeleteAttachment(params.row.attachmentID)}
                         sx={{ width: "40px", Height: "40px" }}
                     >
-                        <Tooltip title="Delete Document" arrow><FontAwesomeIcon icon={faSquareMinus} /></Tooltip>
+                        <Tooltip title="Delete Document" arrow><FontAwesomeIcon icon={faSquareMinus} color='#ff0000' /></Tooltip>
+                    </IconButton>
+                    <IconButton
+                        color="secondary"
+                        size="small"
+                        onClick={() => handleDownloadDocument(params.row.attachmentID)}
+                        sx={{ width: "40px", Height: "40px" }}
+                    >
+                        <Tooltip title="Download Document" arrow><FontAwesomeIcon icon={faDownload} color='#1976d2' /></Tooltip>
                     </IconButton>
                 </div>
             ),

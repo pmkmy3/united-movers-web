@@ -223,6 +223,14 @@ export const fetchRiderAttachmentsById = createAsyncThunk('riders/fetchRiderAtta
     return response.json();
 });
 
+export const fetchDocumentContentById = createAsyncThunk('riders/fetchDocumentContentById', async (id) => {
+    const response = await fetch(`${API_BASE_URL}Rider/GetAttachmentContent/${id}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch document content');
+    }
+    return response.json();
+});
+
 export const addRider = createAsyncThunk('riders/addRider', async (rider) => {
   const requestOptions = {
     method: "POST",
@@ -404,6 +412,18 @@ const riderSlice = createSlice({
         state.rider = action.payload;
       })
       .addCase(fetchRiderAttachmentsById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(fetchDocumentContentById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchDocumentContentById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.rider = action.payload;
+      })
+      .addCase(fetchDocumentContentById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })

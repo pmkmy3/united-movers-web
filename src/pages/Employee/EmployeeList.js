@@ -10,7 +10,6 @@ import {
 import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Button, Tooltip } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare, faSquare, faCircleUser } from '@fortawesome/free-regular-svg-icons';
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import EmployeeFormModal from './EmployeeFormModal';
 import ActivateEmployeeModal from './ActivateEmployeeModal';
 import UserRolesModal from '../employee/UserRolesModal';

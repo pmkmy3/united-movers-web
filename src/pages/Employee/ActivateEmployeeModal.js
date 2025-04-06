@@ -7,13 +7,12 @@ const style = {
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
-    height: 400,
-    width: 500
+    height: 350,
+    width: 400
 };
 
 const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID, isActive }) => {
@@ -56,10 +55,10 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID, 
         }
 
         if (!activationDate) {
-            newError.activationDate = 'Activation date is required.';
+                newError.activationDate = `${datePickerLabel} is required.`;
             validationError = true;
         } else if (activationDate < today) {
-            newError.activationDate = 'Activation date cannot be in the past.';
+            newError.activationDate = `${datePickerLabel} cannot be in the past.`;
             validationError = true;
         }
 
@@ -81,9 +80,9 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID, 
 
     const handleDateBlur = () => {
         if (!activationDate) {
-            setError((prev) => ({ ...prev, activationDate: 'Activation date is required.' }));
+            setError((prev) => ({ ...prev, activationDate: `${datePickerLabel} is required.` }));
         } else if (activationDate < today) {
-            setError((prev) => ({ ...prev, activationDate: 'Activation date cannot be in the past.' }));
+            setError((prev) => ({ ...prev, activationDate: `${datePickerLabel} cannot be in the past.` }));
         } else {
             setError((prev) => ({ ...prev, activationDate: '' }));
         }
@@ -110,12 +109,12 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID, 
         >
             <Box sx={style}>
                 <Grid container spacing={3} size={12}>
-                    <Grid size={6}>
+                    <Grid size={8}>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
                             {title}
                         </Typography>
                     </Grid>
-                    <Grid size={6} sx={{ textAlign: 'right'}}>
+                    <Grid size={4} sx={{ textAlign: 'right'}}>
                         <CloseRoundedIcon style={{ 'color': "red", 'cursor' : "pointer"}} onClick={handleClose} />
                     </Grid>
                 </Grid>

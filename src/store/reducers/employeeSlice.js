@@ -219,6 +219,14 @@ export const fetchEmployeeRolesById = createAsyncThunk('employees/fetchEmployeeR
     return response.json();
 });
 
+export const fetchDocumentContentById = createAsyncThunk('employees/fetchDocumentContentById', async (id) => {
+    const response = await fetch(`${API_BASE_URL}Employee/GetAttachmentContent/${id}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch document content');
+    }
+    return response.json();
+});
+
 export const addEmployee = createAsyncThunk('employees/addEmployee', async (employee) => {
     const requestOptions = {
         method: "POST",
@@ -451,6 +459,19 @@ const employeeSlice = createSlice({
                 });
             })
             .addCase(fetchEmployeeRolesById.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.error.message;
+            })
+            .addCase(fetchDocumentContentById.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchDocumentContentById.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = '';
+                state.successMessage = 'Fetched Document Content by id successfully';
+            })
+            .addCase(fetchDocumentContentById.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
             })

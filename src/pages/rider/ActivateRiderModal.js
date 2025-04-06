@@ -1,27 +1,41 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Box, TextField, Button, Typography, Grid2 as Grid } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import { activateRider } from '../../store/reducers/riderSlice';
 
 const style = {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
     bgcolor: 'background.paper',
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
     height: 400,
-    width: 500
+    width: 400
 };
 
-const ActivateRiderModal = ({ open, handleClose, handleActivate, rider }) => {
+const ActivateRiderModal = ({ open, handleClose, handleActivate, riderID, isActive }) => {
+    const [title, setTitle] = useState('Activate Rider');
+    const [datePickerLabel, setDatePickerLabel] = useState('Activation Date');
+    const [buttonLabel, setButtonLabel] = useState('Activate');
+
     const [comments, setComments] = useState('');
     const [activationDate, setActivationDate] = useState('');
     const [error, setError] = useState({ comments: '', activationDate: '' });
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
+    useEffect(() => {
+        if(isActive) {
+            setTitle('Deactivate Rider');
+            setDatePickerLabel('Deactivation Date');
+            setButtonLabel('Deactivate');
+        }
+        setComments('');
+        setActivationDate('');
+        setError({ comments: '', activationDate: '' });
+        setIsButtonDisabled(true);
+    }, [open]);
 
     useEffect(() => {
         if (comments && activationDate && !error.comments && !error.activationDate) {
@@ -41,26 +55,26 @@ const ActivateRiderModal = ({ open, handleClose, handleActivate, rider }) => {
         }
 
         if (!activationDate) {
-            newError.activationDate = 'Activation date is required.';
+            newError.activationDate = `${datePickerLabel} is required.`;
             validationError = true;
         } else if (activationDate < today) {
-            newError.activationDate = 'Activation date cannot be in the past.';
+            newError.activationDate = `${datePickerLabel} cannot be in the past.`;
             validationError = true;
         }
 
         setError(newError);
 
         if (!validationError) {
-            handleActivate(rider, comments, activationDate);
+            handleActivate(riderID, comments, activationDate);
             handleClose();
         }
     };
 
     const handleDateBlur = () => {
         if (!activationDate) {
-            setError((prev) => ({ ...prev, activationDate: 'Activation date is required.' }));
+            setError((prev) => ({ ...prev, activationDate: `${datePickerLabel} is required.` }));
         } else if (activationDate < today) {
-            setError((prev) => ({ ...prev, activationDate: 'Activation date cannot be in the past.' }));
+            setError((prev) => ({ ...prev, activationDate: `${datePickerLabel} cannot be in the past.` }));
         } else {
             setError((prev) => ({ ...prev, activationDate: '' }));
         }
@@ -89,7 +103,7 @@ const ActivateRiderModal = ({ open, handleClose, handleActivate, rider }) => {
                 <Grid container spacing={3} size={12}>
                     <Grid size={6}>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
-                            Activate Rider
+                            {title}
                         </Typography>
                     </Grid>
                     <Grid size={6} sx={{ textAlign: 'right'}}>
@@ -119,7 +133,7 @@ const ActivateRiderModal = ({ open, handleClose, handleActivate, rider }) => {
                     required
                     fullWidth
                     id="activationDate"
-                    label="Activation Date"
+                    label={datePickerLabel}
                     name="activationDate"
                     type="date"
                     slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: today } }}
@@ -142,7 +156,7 @@ const ActivateRiderModal = ({ open, handleClose, handleActivate, rider }) => {
                         sx={{ maxWidth: 150 }}
                         disabled={isButtonDisabled}
                     >
-                        Activate
+                        {buttonLabel}
                     </Button>
                 </Box>
             </Box>

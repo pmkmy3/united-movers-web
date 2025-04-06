@@ -10,10 +10,8 @@ import {
 import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Tooltip } from '@mui/material';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare, faSquare } from '@fortawesome/free-regular-svg-icons';
-import { faTrashCan } from '@fortawesome/free-solid-svg-icons';
 import RiderFormModal from './RiderFormModal';
 import ActivateRiderModal from './ActivateRiderModal';
-import { deleteRider } from '../../store/reducers/riderSlice';
 
 const CustomToolbar = () => {
     return (
@@ -167,7 +165,7 @@ const RiderList = () => {
                     open={activateModalOpen}
                     handleClose={() => setActivateModalOpen(false)}
                     handleActivate={handleActivateSubmit}
-                    rider={selectedRider}
+                    rider={selectedRider.riderID}
                 />
             )}
         </Container>
