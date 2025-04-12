@@ -65,7 +65,14 @@ const ActivateRiderModal = ({ open, handleClose, handleActivate, riderID, isActi
         setError(newError);
 
         if (!validationError) {
-            handleActivate(riderID, comments, activationDate);
+            const activationObj = {
+                riderID,
+                activateRider: !isActive,
+                loggedInUser: -1,
+                comments,
+                activationDate
+            }
+            handleActivate(activationObj);
             handleClose();
         }
     };

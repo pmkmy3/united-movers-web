@@ -6,7 +6,7 @@ import Sidebar from './components/sidebar/Sidebar';
 import Header from './components/header/Header';
 import Footer from './components/footer/Footer';
 import Home from './pages/home/Home';
-import Login from './pages/auth/login/Login';
+import Login from './pages/auth/login2/login';
 import EmployeeList from './pages/employee/EmployeeList';
 import RiderList from './pages/rider/RiderList';
 

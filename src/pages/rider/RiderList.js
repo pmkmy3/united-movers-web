@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchRiders, fetchVendors, fetchRiderDocumentTypes } from '../../store/reducers/riderSlice';
+import { fetchRiders, fetchVendors, fetchRiderDocumentTypes, activateRider } from '../../store/reducers/riderSlice';
 import {
     DataGrid,
     GridToolbarContainer,
@@ -54,18 +54,20 @@ const RiderList = () => {
     };
 
     const handleActivate = (row) => {
-        // Add logic to handle activating the rider
         setselectedRider(row);
         setActivateModalOpen(true);
-        console.log("Activate", row);
     };
     
-    const handleActivateSubmit = (rider, comments, activationDate) => {
-        // Add logic to handle activating the rider
-        console.log("Activate", rider, comments, activationDate);
+    const handleActivateSubmit = async (data) => {
+        const response = await dispatch(activateRider(data));
+        if (response.payload) {
+            reloadGrid();
+        }
+        setActivateModalOpen(false);
     };
 
     const reloadGrid = () => {
+        setFilteredRiders([]);
         dispatch(fetchRiders());
     };
 
@@ -165,7 +167,8 @@ const RiderList = () => {
                     open={activateModalOpen}
                     handleClose={() => setActivateModalOpen(false)}
                     handleActivate={handleActivateSubmit}
-                    rider={selectedRider.riderID}
+                    riderID={selectedRider.riderID}
+                    isActive={selectedRider.isActive}
                 />
             )}
         </Container>

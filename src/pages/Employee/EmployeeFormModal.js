@@ -6,11 +6,12 @@ import { fetchEmployeeById, fetchEmployeeAttachmentsById, fetchDocumentContentBy
 import { Modal, Box, TextField, Button, Typography, Grid2 as Grid, MenuItem, 
     IconButton, Tooltip, FormControl, FormLabel, RadioGroup,
     FormControlLabel, Radio, InputLabel, Select } from '@mui/material';
+import InputAdornment from '@mui/material/InputAdornment';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import Tabs from "../../components/tabPanel/Tabs";
 import Panel from "../../components/tabPanel/Panel";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEdit, faSquarePlus, faSquareMinus } from '@fortawesome/free-regular-svg-icons';
+import { faEdit, faSquarePlus, faSquareMinus, faCalendarDays } from '@fortawesome/free-regular-svg-icons';
 import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import {
     DataGrid
@@ -488,7 +489,16 @@ const EmployeeFormModal = ({ employeeID, employeeDocumentTypes, reloadGrid }) =>
                                             variant="outlined"
                                             size="small"
                                             type="date"
-                                            slotProps={{ inputLabel: { shrink: true } }}
+                                            slotProps={{ 
+                                                inputLabel: { shrink: true }
+                                                // input: {
+                                                //     endAdornment: (
+                                                //         <InputAdornment position="start">
+                                                //             <FontAwesomeIcon icon={faCalendarDays} color='#1976d2' />
+                                                //         </InputAdornment>
+                                                //     )
+                                                // }
+                                            }}
                                             name="dateOfBirth"
                                             value={formData.dateOfBirth}
                                             onChange={handleChange}
