@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/static/css/main.05b06e70.css",
+    "main.js": "/static/js/main.6c57eb97.js",
+    "static/js/453.0e78096e.chunk.js": "/static/js/453.0e78096e.chunk.js",
+    "static/media/bike_hero.jpg": "/static/media/bike_hero.ee094c793b3b2b5a9e4b.jpg",
+    "static/media/Login_UM_Logo.jpg": "/static/media/Login_UM_Logo.ba6de9b6768c442ce7d0.jpg",
+    "static/media/Header_UM_Logo.png": "/static/media/Header_UM_Logo.332916a9c8b7ed49c294.png",
+    "index.html": "/index.html",
+    "main.05b06e70.css.map": "/static/css/main.05b06e70.css.map",
+    "main.6c57eb97.js.map": "/static/js/main.6c57eb97.js.map",
+    "453.0e78096e.chunk.js.map": "/static/js/453.0e78096e.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.05b06e70.css",
+    "static/js/main.6c57eb97.js"
+  ]
+}
