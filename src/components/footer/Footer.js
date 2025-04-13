@@ -11,6 +11,11 @@ const FooterContainer = styled.footer`
   width: 100%;
 `;
 
-const Footer = () => <FooterContainer>&#169; 2025. All rights reserved to United Movers</FooterContainer>;
+const Footer = () => <FooterContainer>
+  &copy; {new Date().getFullYear()} United Movers. All rights reserved.
+  
+  <a href="#" target="_blank" rel="noopener noreferrer">Privacy Policy</a> | 
+  <a href="#" target="_blank" rel="noopener noreferrer">Terms of Service</a>
+</FooterContainer>;
 
 export default Footer;

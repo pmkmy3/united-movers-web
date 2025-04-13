@@ -59,6 +59,7 @@ const Login = (props) => {
                     if (data.userId && data.isTempPassword) {
                         setOpenChangePasswordDialog(true);
                     } else {
+                        localStorage.setItem('authToken', data.token);
                         props.parentCallback(true);
                         navigate('/home');
                     }
@@ -145,11 +146,17 @@ const Login = (props) => {
                             borderRight: '1px solid #dbdbdb', 
                         }}
                     >
-                        <Typography variant="h4" align="left" sx={{mt: 2}}>
-                            <p>Sign into</p>
-                            <h2>United Moviers</h2>
-                            <h5>If you don’t have an account, then please contact your administrator.</h5>
+                        <Box sx={{ mt: 2 }}>
+                        <Typography variant="h4" align="left" gutterBottom>
+                            Sign into
                         </Typography>
+                        <Typography variant="h2" align="left" gutterBottom>
+                            United Moviers
+                        </Typography>
+                        <Typography variant="h6" align="left">
+                            If you don’t have an account, then please contact your administrator.
+                        </Typography>
+                        </Box>
                     </Box>
                     <Box
                         flex={3}
