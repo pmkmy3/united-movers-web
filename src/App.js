@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate  } from 'react-router-dom';
+import { LoadingProvider } from './context/loadingContext';
 import './App.css';
 import styled from 'styled-components';
 import Sidebar from './components/sidebar/Sidebar';
@@ -9,6 +10,7 @@ import Home from './pages/home/Home';
 import Login from './pages/auth/login2/login';
 import EmployeeList from './pages/employee/EmployeeList';
 import RiderList from './pages/rider/RiderList';
+import GlobalLoadingSpinner from './components/common/globalLoadingSpinner';
 
 const AppContainer = styled.div`
   display: flex;
@@ -41,7 +43,7 @@ const FooterContainer = styled.footer`
 `;
 
 const App = () => {
-  const [loggedIn, setloggedIn] = useState(true);
+  const [loggedIn, setloggedIn] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const callbackFunction = (childData) => {
@@ -53,40 +55,45 @@ const App = () => {
   };
 
   return (
-    <Router>
-      <>
-        {loggedIn ? (
-          <AppContainer>
-            <HeaderContainer>
-              <Header isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
-            </HeaderContainer>
-            <Layout>
-              <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse}  />
-              <div className={`content ${isCollapsed ? 'collapsed' : ''}`}>
-                <main>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/employee" element={<EmployeeList />} />
-                    <Route path="/rider" element={<RiderList />} />
-                  </Routes>
-                </main>
-              </div>
-            </Layout>
-            <FooterContainer>
-              <Footer />
-            </FooterContainer>
-          </AppContainer>
-        ) : (
-          <Routes>
-            <Route
-              path="auth/login"
-              element={<Login parentCallback={callbackFunction} />}
-            />
-            <Route path="*" element={<Navigate to="auth/login" />} /> {/* Redirect to login */}
-          </Routes>
-        )}
-      </>
-    </Router>
+    <LoadingProvider>
+      <Router>
+        <GlobalLoadingSpinner />
+        <>
+          {loggedIn ? (
+            <AppContainer>
+              <HeaderContainer>
+                <Header isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
+              </HeaderContainer>
+              <Layout>
+                <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse}  />
+                <div className={`content ${isCollapsed ? 'collapsed' : ''}`}>
+                  <main>
+                    <Routes>
+                      <Route path="/" element={<Home />} />
+                      <Route path="/home" element={<Home />} />
+                      <Route path="/employee" element={<EmployeeList />} />
+                      <Route path="/rider" element={<RiderList />} />
+                    </Routes>
+                  </main>
+                </div>
+              </Layout>
+              <FooterContainer>
+                <Footer />
+              </FooterContainer>
+            </AppContainer>
+          ) : (
+            <Routes>
+              <Route
+                path="auth/login"
+                element={<Login parentCallback={callbackFunction} />}
+              />
+              <Route path="*" element={<Navigate to="/auth/login" />} /> {/* Redirect to login */}
+            </Routes>
+          )}
+        </>
+      </Router>
+    </LoadingProvider>
+    
   );
 };
 

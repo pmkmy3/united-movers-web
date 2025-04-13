@@ -8,6 +8,7 @@ import {
     GridToolbarFilterButton
 } from '@mui/x-data-grid';
 import { TextField, Box, Container, CssBaseline, Typography, Grid2 as Grid, IconButton, Button, Tooltip } from '@mui/material';
+import CircularProgress from '@mui/material/CircularProgress';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckSquare, faSquare, faCircleUser } from '@fortawesome/free-regular-svg-icons';
 import EmployeeFormModal from './EmployeeFormModal';
@@ -129,83 +130,104 @@ const EmployeeList = () => {
 
 
     return (
-        <Container component="main" maxWidth={false} sx={{ maxwidth: '100%' }}>
-            <CssBaseline />
-            <Box sx={{ mt: 0 }}>
-                <Typography component="h3" variant="h5">
-                    Employees
-                </Typography>
-                <Grid container spacing={12}>
-                    <Grid size={6}>
-                        <TextField
-                            variant="outlined"
-                            margin="normal"
-                            size="small"
-                            id="search"
-                            label="Search"
-                            name="search"
-                            autoComplete="off"
-                            onChange={handleSearch}
-                            sx={{ width: '50%' }}
-                        />
-                    </Grid>
-                    <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
-                        <EmployeeFormModal reloadGrid={reloadGrid} />
-                    </Grid>
-                </Grid>
-                <Box sx={{ minHeight: "100%", width: '100%' }}>
-                    <DataGrid
-                        getRowId={(row) => row.employeeID}
-                        rows={filteredEmployees}
-                        columns={columns}
-                        paginationModel={paginationModel}
-                        onPaginationModelChange={setPaginationModel}
-                        pageSizeOptions={[5, 10, 20, 50]}
-                        paginationMode="client"
-                        rowCount={filteredEmployees.length}
-                        disableRowSelectionOnClick
-                        rowHeight={35}
-                        components={{
-                            Toolbar: CustomToolbar,
-                        }}
-                        sx={{
-                            "& .MuiDataGrid-footerContainer": {
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                flexWrap: "nowrap"
-                            },
-                            "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
-                                margin: "0 8px"
-                            },
-                            "& .MuiTablePagination-toolbar": {
-                                alignItems: "center", // Ensures vertical centering of the pagination toolbar content
-                                display: "flex",
-                                flexWrap: "nowrap"
-                            }
-                        }}
-                    />
+        <>
+            {loading && (
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        width: '100%',
+                        height: '100%',
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        zIndex: 9999,
+                    }}
+                >
+                    <CircularProgress />
                 </Box>
-            </Box>
-            {selectedEmployee && (
-                <ActivateEmployeeModal
-                    open={activateModalOpen}
-                    handleClose={() => setActivateModalOpen(false)}
-                    handleActivate={handleActivateSubmit}
-                    employeeID={selectedEmployee.employeeID}
-                    isActive={selectedEmployee.isActive}
-                />
             )}
-            {selectedEmployee && (
-                <UserRolesModal
-                    employeeRoles={employeeRoles} 
-                    open={userRolesModalOpen}
-                    handleClose={() => setUserRolesModalOpen(false)}
-                    handleAssignRoles={() => { /* logic */ }}
-                    employeeID={selectedEmployee.employeeID}
-                />
-            )}
-        </Container>
+            <Container component="main" maxWidth={false} sx={{ maxwidth: '100%' }}>
+                <CssBaseline />
+                <Box sx={{ mt: 0 }}>
+                    <Typography component="h3" variant="h5">
+                        Employees
+                    </Typography>
+                    <Grid container spacing={12}>
+                        <Grid size={6}>
+                            <TextField
+                                variant="outlined"
+                                margin="normal"
+                                size="small"
+                                id="search"
+                                label="Search"
+                                name="search"
+                                autoComplete="off"
+                                onChange={handleSearch}
+                                sx={{ width: '50%' }}
+                            />
+                        </Grid>
+                        <Grid size={6} sx={{ textAlign: 'right', marginTop: 2.5 }}>
+                            <EmployeeFormModal reloadGrid={reloadGrid} />
+                        </Grid>
+                    </Grid>
+                    <Box sx={{ minHeight: "100%", width: '100%' }}>
+                        <DataGrid
+                            getRowId={(row) => row.employeeID}
+                            rows={filteredEmployees}
+                            columns={columns}
+                            paginationModel={paginationModel}
+                            onPaginationModelChange={setPaginationModel}
+                            pageSizeOptions={[5, 10, 20, 50]}
+                            paginationMode="client"
+                            rowCount={filteredEmployees.length}
+                            disableRowSelectionOnClick
+                            rowHeight={35}
+                            components={{
+                                Toolbar: CustomToolbar,
+                            }}
+                            sx={{
+                                "& .MuiDataGrid-footerContainer": {
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    flexWrap: "nowrap"
+                                },
+                                "& .MuiTablePagination-selectLabel, & .MuiTablePagination-displayedRows": {
+                                    margin: "0 8px"
+                                },
+                                "& .MuiTablePagination-toolbar": {
+                                    alignItems: "center", // Ensures vertical centering of the pagination toolbar content
+                                    display: "flex",
+                                    flexWrap: "nowrap"
+                                }
+                            }}
+                        />
+                    </Box>
+                </Box>
+                {selectedEmployee && (
+                    <ActivateEmployeeModal
+                        open={activateModalOpen}
+                        handleClose={() => setActivateModalOpen(false)}
+                        handleActivate={handleActivateSubmit}
+                        employeeID={selectedEmployee.employeeID}
+                        isActive={selectedEmployee.isActive}
+                    />
+                )}
+                {selectedEmployee && (
+                    <UserRolesModal
+                        employeeRoles={employeeRoles} 
+                        open={userRolesModalOpen}
+                        handleClose={() => setUserRolesModalOpen(false)}
+                        handleAssignRoles={() => { /* logic */ }}
+                        employeeID={selectedEmployee.employeeID}
+                    />
+                )}
+            </Container>
+        </>
+        
     );
 }
 
