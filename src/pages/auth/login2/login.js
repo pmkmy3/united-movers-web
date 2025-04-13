@@ -151,7 +151,7 @@ const Login = (props) => {
                             Sign into
                         </Typography>
                         <Typography variant="h2" align="left" gutterBottom>
-                            United Moviers
+                            United Movers
                         </Typography>
                         <Typography variant="h6" align="left">
                             If you don’t have an account, then please contact your administrator.

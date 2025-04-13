@@ -27,7 +27,7 @@ const Header = ({ isCollapsed, toggleCollapse }) => (
       |
     </div> 
     <div className='logo'>
-      <img src={logoImage} alt="Logo" height='30px' />
+      <img src={logoImage} alt="Logo" height='40px' />
     </div>
   </HeaderContainer>
 );

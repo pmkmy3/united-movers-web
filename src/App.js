@@ -4,7 +4,7 @@ import { LoadingProvider } from './context/loadingContext';
 import './App.css';
 import styled from 'styled-components';
 import Sidebar from './components/sidebar/Sidebar';
-import Header from './components/header/Header';
+import Header from './components/header2/Header';
 import Footer from './components/footer/Footer';
 import Home from './pages/home/Home';
 import Login from './pages/auth/login2/login';
@@ -62,7 +62,7 @@ const MainApp = ({ loggedIn, setLoggedIn, isCollapsed, toggleCollapse, callbackF
   return loggedIn ? (
     <AppContainer>
       <HeaderContainer>
-        <Header isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
+        <Header parentCallback={callbackFunction} toggleCollapse={toggleCollapse} />
       </HeaderContainer>
       <Layout>
         <Sidebar isCollapsed={isCollapsed} toggleCollapse={toggleCollapse} />
