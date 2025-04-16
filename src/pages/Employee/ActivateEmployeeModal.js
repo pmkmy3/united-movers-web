@@ -70,7 +70,8 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID, 
                 activateEmployee: !isActive,
                 loggedInUser: "-1",
                 comments,
-                password: ""
+                password: "",
+                activationDate
             }
             // handleActivate(employeeID, comments, activationDate);
             handleActivate(activationObj);
