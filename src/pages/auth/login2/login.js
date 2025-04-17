@@ -78,14 +78,14 @@ const Login = (props) => {
         }
     };
 
-    const handleChangePassword = () => {
+    const handleChangePassword = async () => {
         if(oldPassword && newPassword && confirmPassword) {
             if(newPassword === confirmPassword) {
                 dispatch(startLoading());
                 try{
-                    const response = dispatch(changePassword({ username, oldPassword, newPassword, securityQuestion: "Test" }));
+                    const response = await dispatch(changePassword({ username, oldPassword, newPassword, securityQuestion: "Test" }));
                     const data = response.payload;
-                    if (data && data.success) {
+                    if (data && data.hasPasswordChanged) {
                         handleCloseChangePasswordDialog();
                         navigate('/auth/login');
                     } else {

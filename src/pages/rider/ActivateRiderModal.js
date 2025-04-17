@@ -26,7 +26,7 @@ const ActivateRiderModal = ({ open, handleClose, handleActivate, riderID, isActi
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
     useEffect(() => {
-        if(isActive) {
+        if(isActive && open) {
             setTitle('Deactivate Rider');
             setDatePickerLabel('Deactivation Date');
             setButtonLabel('Deactivate');
