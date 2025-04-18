@@ -26,15 +26,18 @@ const ActivateEmployeeModal = ({ open, handleClose, handleActivate, employeeID, 
     const [isButtonDisabled, setIsButtonDisabled] = useState(true);
 
     useEffect(() => {
+        setTitle('Activate Employee');
+        setDatePickerLabel('Activation Date');
+        setButtonLabel('Activate');
+        setComments('');
+        setActivationDate('');
+        setError({ comments: '', activationDate: '' });
+        setIsButtonDisabled(true);
         if(isActive && open) {
             setTitle('Deactivate Employee');
             setDatePickerLabel('Deactivation Date');
             setButtonLabel('Deactivate');
         }
-        setComments('');
-        setActivationDate('');
-        setError({ comments: '', activationDate: '' });
-        setIsButtonDisabled(true);
     }, [open]);
 
     useEffect(() => {
