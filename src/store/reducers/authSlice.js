@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
-// const API_BASE_URL = 'https://unitedmovers-eff8g5f6dwgde6e8.eastus2-01.azurewebsites.net/api/';
-const API_BASE_URL = 'https://localhost:7248/api/';
+// const API_BASE_URL = process.env.API_BASE_URL;
+const API_BASE_URL = 'https://unitedmovers-eff8g5f6dwgde6e8.eastus2-01.azurewebsites.net/api/';
 
 export const loginEmployee = createAsyncThunk('auth/loginEmployee', async (credentials) => {
     const response = await fetch(`${API_BASE_URL}Auth/login`, {
